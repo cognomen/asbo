@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'asbo'
+ASBO.run(ARGV)
