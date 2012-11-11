@@ -3,6 +3,6 @@ module ASBO
   WORKSPACE_INDICATOR = '.asbo'
   CACHE_DIR = '.asbo/cache'
   BUILDFILE = 'buildfile.yml'
-  PROJ_CONFIG = '.asbo/config.yml'
+  SOURCES_CONFIG = '.asbo/sources.yml'
   SOURCE_VERSION = 'source'
 end

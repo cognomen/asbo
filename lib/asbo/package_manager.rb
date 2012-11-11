@@ -41,9 +41,9 @@ module ASBO
 
     def download_dep(dep)
       log.info "Downloading #{dep}"
-      source = dep_source(dep)
+      source = @workspace_config.package_source(dep.package, 'release', dep.version)
       log.debug "Downloading from #{source}"
-      repo = Repo.factory(source)
+      repo = Repo.factory(@workspace_config, source)
       file = repo.download
       log.info "Extracting #{dep}"
       extract_package(file, dep)
@@ -65,23 +65,6 @@ module ASBO
 
     def artifacts_path(dep)
       File.join(dependency_path(dep), "#{dep.arch}-#{dep.abi}-#{dep.build_config}", 'build')
-    end
-
-    def dep_source(dep)
-      source = @workspace_config.package_source(dep.package)
-      var_definitions = {
-        'package' => dep.package,
-        'version' => dep.version,
-      }
-      # Check that key starts with $, but then strip it
-      config_definitions = @workspace_config.package_vars(dep.package)
-      var_definitions.merge!(config_definitions) if config_definitions
-      vars = source.scan(/(?<!\\)\$<?([a-z][0-9a-z]*)/).flatten
-
-      undefined_vars = vars - var_definitions.keys
-      raise "Unknown variable(s) #{undefined_vars.join(', ')} in source for package #{dep.package}" unless undefined_vars.empty?
-
-      vars.inject(source){ |s,v| s.gsub(/\$<?#{v}>?/, var_definitions[v].to_s) }
     end
 
     def extract_package(path, dep)

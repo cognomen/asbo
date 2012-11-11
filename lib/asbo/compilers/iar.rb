@@ -7,7 +7,7 @@ module ASBO::Compiler
       @dependencies = @pacman.project_config.dependencies
     end
 
-    def write_files
+    def prepare
       log.info "Include opts: #{include_opts(@dependencies)}"
       log.info "Linker opts: #{linker_opts(@dependencies)}"
     end

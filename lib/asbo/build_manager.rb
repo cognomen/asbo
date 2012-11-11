@@ -18,8 +18,7 @@ module ASBO
       pacman.download_dependencies
 
       compiler = Compiler::factory(compiler, pacman)
-      compiler.write_files
-
+      compiler.prepare
     end
 
     def post_build

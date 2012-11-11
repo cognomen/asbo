@@ -2,29 +2,63 @@ module ASBO
   class WorkspaceConfig
     include Logger
 
+    VARIABLE_FIND_REGEX = /(?<!\\)\$([a-z][0-9a-z]*)/
+
+    attr_reader :workspace
+
     def initialize(start_dir)
       @workspace = find_workspace(start_dir)
-      proj_config = File.join(@workspace, PROJ_CONFIG)
-      raise "Unable to find project config file (should be at #{proj_config})" unless File.file?(proj_config)
-      @config = YAML::load_file(proj_config)
+      sources_config = File.join(@workspace, SOURCES_CONFIG)
+      raise "Unable to find sources config file (should be at #{sources_config})" unless File.file?(sources_config)
+      @source_config = YAML::load_file(sources_config)
     end
 
     def cache_dir
       File.join(@workspace, CACHE_DIR)
     end
 
-    def package_vars(package)
-      # Check that key starts with $, but then strip it
-      Hash[@config[package].select{ |k,v| k.start_with?('$') }.map{ |k,v| [k[1..-1], v] }]
-    end
+    # type can be e.g. 'release' or 'latest'
+    def package_source(package, type, version)
+      # First look in package section, then in main bit
+      source = nil
+      source = @source_config[package][type] if type
+      source = @source_config[type] unless source
+      raise "Could not find source for package #{package}, type #{type}" unless source
 
-    def package_source(package)
-      source = @config[package]['source'] || @config['default_source']
-      raise "Could not find source for package #{package}" unless source
+      defined_vars = {
+        'package' => package,
+        'version' => version,
+      }
+      source = resolve_vars(@source_config, source, defined_vars, package)
       source
     end
 
-    private
+    def resolve_vars_in_str(str, var_definitions)
+      begin
+        new_str, str = str.gsub(VARIABLE_FIND_REGEX){ var_definitions[$1] || "$#{$1}" }, new_str
+      end while str =~ VARIABLE_FIND_REGEX && str != new_str
+      new_str
+    end
+
+    def resolve_vars(config, value, var_definitions={}, section=nil)
+      var_definitions = find_vars(config, section).merge(var_definitions)
+
+      # Make sure all of the definitions are resolved
+      var_definitions.each do |k,v|
+        var_definitions[k] = resolve_vars_in_str(v, var_definitions) if v =~ VARIABLE_FIND_REGEX
+      end
+
+      value = resolve_vars_in_str(value, var_definitions)
+      value
+    end
+
+    def find_vars(config, section=nil)
+      # Look in the base first, and then section
+      vars = {}
+      vars = @source_config.select{ |k,v| k.start_with?('$') }.merge(vars)
+      vars = @source_config[section].select{ |k,v| k.start_with?('$') }.merge(vars) if section
+      Hash[vars.map{ |k,v| [k[1..-1], v] }]
+    end
 
     def find_workspace(start_dir)
       folder = File.expand_path(start_dir)

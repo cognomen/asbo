@@ -1,7 +1,7 @@
 module ASBO::Repo
   class File
-    def initialize(source)
-      @source = ::File.expand_path(source)
+    def initialize(workspace_config, source)
+      @source = ::File.expand_path(::File.join(workspace_config.workspace, source))
     end
 
     def download
