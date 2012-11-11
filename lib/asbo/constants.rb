@@ -5,4 +5,5 @@ module ASBO
   BUILDFILE = 'buildfile.yml'
   SOURCES_CONFIG = '.asbo/sources.yml'
   SOURCE_VERSION = 'source'
+  LATEST_VERSION = 'latest'
 end
