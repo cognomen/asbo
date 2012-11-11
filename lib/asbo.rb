@@ -12,7 +12,8 @@ module ASBO
   extend self
 
   def run
-    BuildManager.new('arm', 'abi', 'test/proj_1').pre_build('iar')
+    # BuildManager.new('arm', 'abi', 'test/proj_1').pre_build('iar')
+    BuildManager.new('arm', 'abi', 'test/proj_1').post_build('Debug')
   end
 end
 

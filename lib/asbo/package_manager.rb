@@ -23,6 +23,47 @@ module ASBO
       end
     end
 
+    def dep_downloaded?(dep)
+      File.directory?(dependency_path(dep))
+    end
+
+    def dependency_path(dep)
+     package_path(dep.package, dep.version)
+    end
+
+    def package_path(package, version)
+       File.join(@workspace_config.cache_dir, "#{package}-#{version}")
+    end
+
+    def headers_path(dep)
+      File.join(dependency_path(dep), 'inc')
+    end
+
+    def artifacts_path(dep)
+      File.join(dependency_path(dep), "#{dep.arch}-#{dep.abi}-#{dep.build_config}", 'build')
+    end
+
+    def cache_project(build_config, version)
+      src = @project_config.project_dir
+      dest = package_path(@project_config.package, version)
+
+      log.info "Caching #{@project_config.package} to #{dest}"
+      # TODO tell them how to nuke this, when we implement it
+      log.warn "Overwriting previously-cached copy of version #{version}" if File.directory?(dest) && version != SOURCE_VERSION
+
+      package_project(src, dest)
+    end
+
+    # dest should point to dir in which to put things
+    def package_project(source, dest)
+      FileUtils.mkdir_p(dest)
+      FileUtils.cp(File.join(source, BUILDFILE), File.join(dest, BUILDFILE))
+      cp_if_exists(source, dest, 'inc')
+      cp_if_exists(source, dest, 'build')
+    end
+
+    private
+
     def process_source_dep(dep)
       if dep_downloaded?(dep)
         log.debug "Source dependency #{dep} found"
@@ -51,22 +92,6 @@ module ASBO
       download_dependencies(ProjectConfig.new(File.join(dependency_path(dep), BUILDFILE), dep.arch, dep.abi))
     end
 
-    def dep_downloaded?(dep)
-      File.directory?(dependency_path(dep))
-    end
-
-    def dependency_path(dep)
-      File.join(@workspace_config.cache_dir, "#{dep.package}-#{dep.version}")
-    end
-
-    def headers_path(dep)
-      File.join(dependency_path(dep), 'inc')
-    end
-
-    def artifacts_path(dep)
-      File.join(dependency_path(dep), "#{dep.arch}-#{dep.abi}-#{dep.build_config}", 'build')
-    end
-
     def extract_package(path, dep)
       # Assume zip file contains name of package
       dest = File.dirname(dependency_path(dep))
@@ -78,6 +103,15 @@ module ASBO
            zf.extract(e.name, file_dest)
         end
       end
+    end
+
+    def cp_if_exists(source, dest, folder)
+      src = File.join(source, folder)
+      dst = File.join(dest, folder)
+      return unless File.exist?(src)
+
+      log.debug "Copying #{src} to #{dst}"
+      FileUtils.cp_r(src, dst)
     end
   end
 end
