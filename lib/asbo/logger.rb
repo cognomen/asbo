@@ -15,7 +15,7 @@ module ASBO
     end
 
     def self.verbose=(value)
-      self.log.level = value ? ::Logger::DEBUG : ::Logger::INFO
+      self.logger.level = value ? ::Logger::DEBUG : ::Logger::INFO
     end
 
     def self.included(klass)

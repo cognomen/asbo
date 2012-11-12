@@ -30,6 +30,7 @@ module ASBO
     end
 
     opts = default_opts.merge(opts)
+    Logger.verbose = opts[:verbose]
 
     case command
     when 'pre-build'
