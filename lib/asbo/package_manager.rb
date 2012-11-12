@@ -40,7 +40,7 @@ module ASBO
     end
 
     def artifacts_path(dep)
-      File.join(dependency_path(dep), "#{dep.arch}-#{dep.abi}-#{dep.build_config}", 'build')
+      File.join(dependency_path(dep), 'bin', "#{dep.arch}-#{dep.abi}-#{dep.build_config}")
     end
 
     def cache_project(build_config, version)
@@ -59,7 +59,7 @@ module ASBO
       FileUtils.mkdir_p(dest)
       FileUtils.cp(File.join(source, BUILDFILE), File.join(dest, BUILDFILE))
       cp_if_exists(source, dest, 'inc')
-      cp_if_exists(source, dest, 'build')
+      cp_if_exists(source, dest, 'bin')
     end
 
     private
