@@ -2,7 +2,7 @@ module ASBO
   class WorkspaceConfig
     include Logger
 
-    VARIABLE_FIND_REGEX = /(?<!\\)\$([a-z][0-9a-z]*)/
+    VARIABLE_FIND_REGEX = /(?<!\\)\$([a-zA-Z][0-9a-zA-Z_]*)/
 
     attr_reader :workspace
 
