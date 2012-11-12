@@ -19,10 +19,16 @@ module ASBO
 
     # type can be e.g. 'release' or 'latest'
     def package_source(package, type, version)
-      # First look in package section, then in main bit
-      source = nil
-      source = @source_config[package][type] if type
-      source = @source_config[type] unless source
+      # First look in package section, then in main bit. In each, first check type, then 'release'
+      soruce = nil
+      if @source_config.has_key?(package)
+        source ||= @source_config[package][type] if @source_config[package].has_key?(type)
+        source ||= @source_config[package]['release'] if @source_config[package].has_key?('release')
+      end
+      
+      source ||= @source_config[type] if @source_config.has_key?(type)
+      source ||= @source_config['release'] if @source_config.has_key?('release')
+
       raise "Could not find source for package #{package}, type #{type}" unless source
 
       defined_vars = {
@@ -56,7 +62,7 @@ module ASBO
       # Look in the base first, and then section
       vars = {}
       vars = @source_config.select{ |k,v| k.start_with?('$') }.merge(vars)
-      vars = @source_config[section].select{ |k,v| k.start_with?('$') }.merge(vars) if section
+      vars = @source_config[section].select{ |k,v| k.start_with?('$') }.merge(vars) if section && @source_config[section]
       Hash[vars.map{ |k,v| [k[1..-1], v] }]
     end
 
