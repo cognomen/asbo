@@ -24,7 +24,7 @@ module ASBO
     when 'pre-build'
       parse_build_args(args, true, false)
     when 'post-build'
-      parse_build_args(args, true, false)
+      parse_build_args(args, false, true)
     else
       {}
     end
@@ -58,8 +58,8 @@ module ASBO
     opts = Trollop::options(args) do
       opt :arch, "Architecture you're building", :type => String, :required => true, :short => 'a'
       opt :abi, "ABI you're building", :type => String, :required => true, :short => 'b'
-      opt :config, "Build configuration (e.g. Debug) you're building", :type => String, :required => need_build_config
-      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => need_compiler
+      opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c' if need_build_config
+      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o' if need_compiler
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
     end
