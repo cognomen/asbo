@@ -5,13 +5,13 @@ These docs are still largely TODO.
 
 Asbo is a package-based build- and dependency-management system for projects.
 
-Get Started
--------------
-Asbo needs Ruby 1.9 or later and depends on
-[trollop] (http://trollop.rubyforge.org/), and
-[zip] (http://rubygems.org/gems/zip)
 
-To install, run `gem install trollop asbo`.
+Getting started
+---------------
+
+Asbo is not currently on rubyforge.
+To install, you'll first need [ruby 1.9](http://rubyinstaller.org/downloads/).
+Then clone (or [download](https://github.com/canton7/asbo/archive/master.zip)) this repo, cd to it, and run `rake install`.
 
 
 sources.yml
