@@ -35,7 +35,7 @@ module ASBO
         'package' => package,
         'version' => version,
       }
-      source = resolve_vars(@source_config, source, defined_vars, package)
+      source = resolve_config_vars(source, defined_vars, package)
       source
     end
 
@@ -46,8 +46,8 @@ module ASBO
       new_str
     end
 
-    def resolve_vars(config, value, var_definitions={}, section=nil)
-      var_definitions = find_vars(config, section).merge(var_definitions)
+    def resolve_config_vars(value, var_definitions={}, section=nil)
+      var_definitions = find_vars(@source_config, section).merge(var_definitions)
 
       # Make sure all of the definitions are resolved
       var_definitions.each do |k,v|
