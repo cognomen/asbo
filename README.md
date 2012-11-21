@@ -17,63 +17,116 @@ Then clone (or [download](https://github.com/canton7/asbo/archive/master.zip)) t
 sources.yml
 -----------
 
+### Introduction
+
 This file lives in .asbo/sources.yml, and tells Asbo where to find packages.
 
-A typical sources.yml might look like this
+Package fetching is handled by a particular backend, which knows how to talk to e.g. the local filesystem, or teamcity, etc.
+You configure the backend to fetch a specific package of a specific version.
 
-```yaml
-$base: file://path/to/repo
-
-release: $base/$package-$version
-latest: $base/$package-nightly
-```
-
-Let's see what's going on here.
-
-### Paths and Variables
-
-First, variables. These start with a `$`, and consist of letters, numbers, and underscores.
-There are two which are defined by Asbo: `$package` and `$version`, while any others are left up to you to define.
-
-So, to analyse the file:
-
-```yaml
-# This defines a variable called $base, with the value file://path/to/repo
-$base: file://path/to/repo
-
-# This tells Asbo where to find the release and 'latest' versions.
-# $package is defined by Asbo, and will hold the name of the package
-# $version is also defined by Asbo, and specifies the package version
-release: $base/$package-$version
-latest: $base/$package-nightly
-```
-
-You can also define paths and variables on a per-project basis, for example:
+For example, the `file` backend has a rather simple config:
 
 ```yaml
 release:
   driver: file
-  path: path/to/repo/$package_id-$version
-
-project_1:
-  $package_id: 20
-
-project_2:
-  release:
-  path: path/to/another/repo/project_2-$version
+  path: path/to/repo/$project-$version
 ```
 
-Here, we defined our own variable $package_id. For project_1, we defined this to be 20 (this can be useful for systems that require some mapping of id to package name).
-For project_2, we defined a completely new path, which overrides the default.
+Here you've said that, when fetching release packages, Asbo should use the 'file' driver.
+`path` is a key specific to the file driver, and tells it where to find the package.
 
-Also, note how we left out the `latest:` key? If this isn't set, the `release:` key is used, with `$version` set to "latest".
+`$project` and `$version` are variables (recognisable by their `$` prefix).
+These two are defined by the `file` driver, but you can also define your own!
+You can additionally override them on a per-package basis.
 
-### Repository types
+### Release and latest
 
-The prefix on the repo path, "file://" above, says what backend to use when accessing the repo.
+You must define a `release` section, which defines the default driver used when fetching packages.
+You can also define a `latest` section, which is used when fetching the latest release.
+If you don't specify one, then the `release` driver is used, with `$version` set to 'release'.
 
-Currently only one backend, 'file', is supported: this looks on the local filesystem for the package, in a path relative to the workspace.
-In future, 'teamcity' will also be supported.
+The `latest` section selectively overrides the `release` one, so the following is valid config:
+
+```yaml
+release:
+  driver: file
+  path: path/to/repo/$project-$version
+
+latest:
+  path: path/to/repo/latest/$project
+```
+
+### Variables
+
+Variables consist of a `$` followed by letters, numbers, and underscores (the first character must be a letter).
+Some variables are defined by the driver, but you can define your own.
+
+For example:
+
+```yaml
+$base: path/to/repo
+
+release:
+  driver: file
+  path: $base/$project-$version
+
+latest:
+  path: $base/latest/$project
+```
+
+And you can override them on a per-project basis
+
+```yaml
+release:
+  driver: file
+  path: $base/$project_id
+
+project_1:
+  # Out of our control. We just provide a mapping
+  $project_id: 4
+
+project_2:
+  $project_id: 18
+```
+
+### Drivers
+
+There are currently two drivers defined, and the option to add more as time progresses.
+
+Each driver requires a number of configuration keys, but also defines a number of variables you'll probably need to use when specifying those keys.
+These are listed below.
+
+#### file
+
+The file driver is used when fetching a package off the local filesystem.
+This is very used when testing, but could also form the basis of a network-share-based repo, for example.
+
+##### Required keys:
+ - `path`: This defines the place the file driver should look for a package
+
+##### Defined variables
+ - `$package`: The name of the package
+ - `$version`: The version of the package  
+
+#### teamcity
+
+The teamcity driver can fetch packages off a TeamCity server.
+It's currently work-in-development, and may only be partially finished, but details TODO.
+
+##### Required keys:
+ - `url`: The base url to use, e.g. 'http://my.teamcity.domain:8111'
+ - `project`: The project to be used
+ - `username`: The username to use to auth. GuestLogin is not currently supported
+ - `password`: The password to use to auth. GuestLogin is not currently supported
+
+##### Optional keys:
+ - `package`: The TeamCity package name used. Defaults to `$package`.
+
+##### Defined variables
+ - `$package`: The name of the package
+ - `$version`: The version of the package  
+
+
 
 buildfile.yml
 -------------
