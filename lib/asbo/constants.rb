@@ -3,6 +3,7 @@ module ASBO
   WORKSPACE_INDICATOR = '.asbo'
   CACHE_DIR = '.asbo/cache'
   BUILDFILE = 'buildfile.yml'
+  PERSONAL_BUILDFILE = 'buildfile.local.yml'
   SOURCES_CONFIG = '.asbo/sources.yml'
   SOURCE_VERSION = 'source'
   LATEST_VERSION = 'latest'
