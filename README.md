@@ -51,19 +51,21 @@ latest: $base/$package-nightly
 You can also define paths and variables on a per-project basis, for example:
 
 ```yaml
-release: file://path/to/repo/$package_id-$version
+release:
+  path: path/to/repo/$package_id-$version
 
 project_1:
   $package_id: 20
 
 project_2:
-  release: file://path/to/another/repo/project_2-$version
+  release:
+  path: path/to/another/repo/project_2-$version
 ```
 
 Here, we defined our own variable $package_id. For project_1, we defined this to be 20 (this can be useful for systems that require some mapping of id to package name).
 For project_2, we defined a completely new path, which overrides the default.
 
-Also, note how we left out the `latest:` key? If this isn't set, the `release:` key is used, with $version` set to "latest".
+Also, note how we left out the `latest:` key? If this isn't set, the `release:` key is used, with `$version` set to "latest".
 
 ### Repository types
 

@@ -83,9 +83,7 @@ module ASBO
     def download_dep(dep)
       log.info "Downloading #{dep}"
       type = dep.is_latest? ? 'latest' : 'release'
-      source = @workspace_config.package_source(dep.package, type, dep.version)
-      log.debug "Downloading from #{source}"
-      repo = Repo.factory(@workspace_config, source)
+      repo = Repo.factory(@workspace_config, dep.package, type, dep.version)
       file = repo.download
       log.info "Extracting #{dep}"
       extract_package(file, dep)

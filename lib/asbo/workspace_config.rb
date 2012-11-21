@@ -18,24 +18,20 @@ module ASBO
     end
 
     # type can be e.g. 'release' or 'latest'
-    def package_source(package, type, version)
+    def package_source(package, type)
       # First look in package section, then in main bit. In each, first check type, then 'release'
-      soruce = nil
+      source = {}
+
       if @source_config.has_key?(package)
-        source ||= @source_config[package][type] if @source_config[package].has_key?(type)
-        source ||= @source_config[package]['release'] if @source_config[package].has_key?('release')
+        source = @source_config[package][type].merge(source) if @source_config[package].has_key?(type)
+        source = @source_config[package]['release'].merge(source) if @source_config[package].has_key?('release')
       end
       
-      source ||= @source_config[type] if @source_config.has_key?(type)
-      source ||= @source_config['release'] if @source_config.has_key?('release')
+      source = @source_config[type].merge(source) if @source_config.has_key?(type)
+      source = @source_config['release'].merge(source) if @source_config.has_key?('release')
 
-      raise "Could not find source for package #{package}, type #{type}" unless source
+      raise "Could not find source for package #{package}, type #{type}" if source == {}
 
-      defined_vars = {
-        'package' => package,
-        'version' => version,
-      }
-      source = resolve_config_vars(source, defined_vars, package)
       source
     end
 
