@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'trollop'
   s.add_dependency 'zip'
+  s.add_dependency 'nokogiri'
   s.required_ruby_version = '>= 1.9.0'
 end

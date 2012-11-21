@@ -1,4 +1,5 @@
 require_relative 'repos/file'
+require_relative 'repos/teamcity'
 
 module ASBO
   module Repo
