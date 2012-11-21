@@ -52,6 +52,7 @@ You can also define paths and variables on a per-project basis, for example:
 
 ```yaml
 release:
+  driver: file
   path: path/to/repo/$package_id-$version
 
 project_1:
