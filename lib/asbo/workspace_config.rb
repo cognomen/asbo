@@ -21,7 +21,7 @@ module ASBO
     def package_source(package, type)
       # First look in package section, then in main bit. In each, first check type, then 'release'
       source = {}
-
+      
       if @source_config.has_key?(package)
         source = @source_config[package][type].merge(source) if @source_config[package].has_key?(type)
         source = @source_config[package]['release'].merge(source) if @source_config[package].has_key?('release')

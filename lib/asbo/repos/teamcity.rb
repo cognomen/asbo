@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'uri'
 require 'tempfile'
 require 'nokogiri'
 
@@ -47,6 +48,7 @@ module ASBO::Repo
     def fetch_bt(project, package)
       projects_url = @url + '/httpAuth/app/rest/projects'
       log.debug "Looking for projects: #{projects_url}"
+      log.debug "Using teamcity project #{project}"
       node = Nokogiri::XML(open(projects_url, :http_basic_authentication => [@user, @pass])).css('project').find{ |x| x['name'] == project }
       raise "Can't find teamcity project #{project}" unless node
       project_url = @url + node['href']
@@ -61,7 +63,7 @@ module ASBO::Repo
       node = Nokogiri::XML(open(builds_url, :http_basic_authentication => [@user, @pass])).css('build').find{ |x| x['number'] == version }
       raise "Unable to find build number #{version}" unless node
       id = node['id']
-      @url + "/httpAuth/app/rest/builds/id:#{id}/artifacts/files/#{package}.zip"
+      URI::escape(@url + "/httpAuth/app/rest/builds/id:#{id}/artifacts/files/#{package}.zip")
     end
   end
 end
