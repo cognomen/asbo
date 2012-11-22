@@ -87,13 +87,17 @@ module ASBO
       file = repo.download
       log.info "Extracting #{dep}"
       extract_package(file, dep)
-      # Now get recursive deps
-      download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi))
+      # Now get recursive deps, if and only if the buildifle exists
+      if File.file?(File.join(dependency_path(dep), BUILDFILE))
+        download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi))
+      else
+        log.warn "Can't find buildfile for dep #{dep}"
+      end
     end
 
     def extract_package(path, dep)
-      # Assume zip file contains name of package
-      dest = File.dirname(dependency_path(dep))
+      dest = dependency_path(dep)
+      log.debug "Extracting #{path} to #{dest}"
       Zip::ZipFile.open(path) do |zf|
         zf.each do |e|
           file_dest = File.join(dest, e.name)
