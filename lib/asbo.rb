@@ -22,9 +22,9 @@ module ASBO
 
     opts = case command
     when 'pre-build'
-      parse_build_args(args, true)
+      parse_build_args(args)
     when 'post-build'
-      parse_build_args(args, false)
+      parse_build_args(args)
     else
       {}
     end
@@ -34,9 +34,9 @@ module ASBO
 
     case command
     when 'pre-build'
-      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:project]).pre_build(opts[:compiler])
+      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:compiler], opts[:project]).pre_build
     when 'post-build'
-      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:project]).post_build
+      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:compiler], opts[:project]).post_build
     else
       Trollop::die "Unknown command #{command}" if command && !COMMANDS.include?(command)
     end
@@ -52,7 +52,7 @@ module ASBO
     opts
   end
 
-  def parse_build_args(args, need_compiler)
+  def parse_build_args(args)
     # Annoying default options have to be duplicated here.
     # TODO resolve
 
@@ -60,7 +60,7 @@ module ASBO
       opt :arch, "Architecture you're building", :type => String, :required => true, :short => 'a'
       opt :abi, "ABI you're building", :type => String, :required => true, :short => 'b'
       opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c'
-      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o' if need_compiler
+      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
     end

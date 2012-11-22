@@ -4,20 +4,20 @@ module ASBO
 
     attr_accessor :verbose
 
-    def initialize(arch, abi, build_config, project_dir=nil)
+    def initialize(arch, abi, build_config, compiler, project_dir=nil)
       project_dir ||= Dir.getwd
-      @arch, @abi, @build_config, @project_dir = arch, abi, build_config, project_dir
+      @arch, @abi, @build_config, @compiler, @project_dir = arch, abi, build_config, compiler, project_dir
       @project_config = ProjectConfig.new(project_dir, arch, abi, build_config)
       @workspace_config = WorkspaceConfig.new(project_dir)
       @verbose = false
     end
 
-    def pre_build(compiler)
+    def pre_build
       log.info "Performing pre-build action"
       pacman = PackageManager.new(@workspace_config, @project_config)
       pacman.download_dependencies
 
-      compiler = Compiler::factory(compiler, pacman)
+      compiler = Compiler::factory(@compiler, pacman)
       compiler.prepare
     end
 
@@ -27,6 +27,8 @@ module ASBO
       version = ENV['VERSION'] || SOURCE_VERSION
       pacman.cache_project(@build_config, version)
 
+      compiler = Compiler::factory(@compiler, pacman)
+      compiler.cleanup
     end
   end
 end
