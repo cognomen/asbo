@@ -4,10 +4,10 @@ module ASBO
   class ProjectConfig
     include Logger
 
-    attr_reader :arch, :abi, :project_dir
+    attr_reader :arch, :abi, :project_dir, :build_config
 
-    def initialize(project_dir, arch, abi)
-      @arch, @abi, @project_dir = arch, abi, project_dir
+    def initialize(project_dir, arch, abi, build_config)
+      @arch, @abi, @build_config, @project_dir = arch, abi, build_config, project_dir
       buildfile = File.join(project_dir, BUILDFILE)
       raise "Can't find buildfile at #{File.expand_path(buildfile)}" unless File.file?(buildfile)
       @config = YAML::load_file(buildfile)
@@ -23,7 +23,16 @@ module ASBO
 
     def dependencies
       return [] unless @config['dependencies']
-      @config['dependencies'].map{ |x| Dependency.new(*x.split(':', 3), @arch, @abi) }
+      @config['dependencies'].map do |x|
+        project, config, version = x.split(/\s*:\s*/, 3)
+        # Allow them to skip the config bit
+        if version.nil?
+          version, config = config, @build_config
+        elsif config.empty?
+          config = @build_config
+        end
+        Dependency.new(project, version, config, @arch, @abi)
+      end
     end
 
     def to_dep(build_config, version)

@@ -142,12 +142,13 @@ A sample file:
 package: project_1
 
 dependencies:
-  - project_2:0.0.1:Release
-  - project_3:latest:Debug
-  - project_4:source:Debug
+  - project_2:Release:0.0.1
+  - project_3:Debug:latest
+  - project_4:source
 ```
 
-The package key defines the name of the project, and the dependencies consist of a list of `<package>:<version>:<build-config>` triplets.
+The package key defines the name of the project, and the dependencies consist of a list of `<package>:<build-config>:<version>` triplets.
+The build config may be ommitted, in which case the current build config is used.
 
 'source' dependencies are not retrieved from the repo, and must instead be built locally.
 This allows the developer to use a bleeding-edge version of a package.

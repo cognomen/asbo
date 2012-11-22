@@ -13,12 +13,16 @@ module ASBO::Compiler
     end
 
     def include_opts(deps)
-      include_paths = deps.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths = deps.map{ |dep|@pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
       include_paths.map{ |x| "-I'#{x}'" }.join(' ')
     end
 
     def linker_opts(deps)
-      artifacts = deps.map{ |dep| Dir["#{@pacman.artifacts_path(dep)}/*.a"] }
+      artifacts = deps.map do |dep|
+        log.debug "Looking for linker targets in #{@pacman.artifacts_path(dep)}"
+        Dir["#{@pacman.artifacts_path(dep)}/*.a"]
+      end
       artifacts.flatten.map{ |x| "-L'#{x}'"}.join(' ')
     end
   end
