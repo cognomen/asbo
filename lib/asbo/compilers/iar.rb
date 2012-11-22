@@ -7,7 +7,7 @@ module ASBO::Compiler
 
     def initialize(package_mananger)
       @pacman = package_mananger
-      @dependencies = @pacman.project_config.dependencies
+      @dependencies = @pacman.all_dependencies
       @output_dir = @pacman.project_config.project_dir
     end
 
@@ -24,7 +24,7 @@ module ASBO::Compiler
     end
 
     def include_opts(deps)
-      include_paths = deps.map{ |dep|@pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths = deps.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
       include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
       include_paths.map{ |x| "-I'#{x}'" }.join(' ')
     end

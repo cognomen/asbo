@@ -43,6 +43,28 @@ module ASBO
       File.join(dependency_path(dep), 'bin', "#{dep.arch}-#{dep.abi}-#{dep.build_config}")
     end
 
+    def all_dependencies
+      r = []
+      @project_config.dependencies.each do |dep|
+        r.push(*recursive_dependencies(dep))
+      end
+      r
+    end
+
+    def recursive_dependencies(dep)
+      # Return all of this dependencies' dependecies
+      unless File.file?(File.join(dependency_path(dep), BUILDFILE))
+        log.warn "Unable to find buildfile for #{dep}"
+        return [dep]
+      end
+      deps = ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config).dependencies
+      r = [dep]
+      deps.each do |d|
+        r.push(*recursive_dependencies(d))
+      end
+      r
+    end
+
     def cache_project(build_config, version)
       src = @project_config.project_dir
       dest = package_path(@project_config.package, version)
@@ -89,7 +111,7 @@ module ASBO
       extract_package(file, dep)
       # Now get recursive deps, if and only if the buildifle exists
       if File.file?(File.join(dependency_path(dep), BUILDFILE))
-        download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi))
+        download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config))
       else
         log.warn "Can't find buildfile for dep #{dep}"
       end
