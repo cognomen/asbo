@@ -35,7 +35,7 @@ module ASBO::Compiler
         # Glob all .a files
         Dir["#{@pacman.artifacts_path(dep)}/*.a"]
       end
-      artifacts.flatten.map{ |x| "-L'#{x}'"}.join(' ')
+      artifacts.flatten.map{ |x| %Q{"#{x}"} }.join("\n")
     end
 
     def cleanup
