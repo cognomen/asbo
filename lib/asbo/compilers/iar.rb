@@ -26,7 +26,7 @@ module ASBO::Compiler
     def include_opts(deps)
       include_paths = deps.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
       include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
-      include_paths.map{ |x| "-I'#{x}'" }.join(' ')
+      include_paths.map{ |x| %Q{-I"#{x}"} }.join(' ')
     end
 
     def linker_opts(deps)
