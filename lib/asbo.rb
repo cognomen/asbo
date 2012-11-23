@@ -60,7 +60,7 @@ module ASBO
       opt :arch, "Architecture you're building", :type => String, :required => true, :short => 'a'
       opt :abi, "ABI you're building", :type => String, :required => true, :short => 'b'
       opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c'
-      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
+      opt :compiler, "Compiler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
     end

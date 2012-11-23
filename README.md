@@ -99,7 +99,7 @@ These are listed below.
 #### file
 
 The file driver is used when fetching a package off the local filesystem.
-This is very used when testing, but could also form the basis of a network-share-based repo, for example.
+This is very often used when testing, but could also form the basis of a network-share-based repo, for example.
 
 ##### Required keys:
  - `path`: This defines the place the file driver should look for a package
