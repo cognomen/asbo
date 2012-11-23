@@ -9,7 +9,7 @@ module ASBO
     def self.logger
       return @logger if @logger
 
-      @logger = ::Logger.new(STDOUT)
+      @logger = ::Logger.new(STDERR)
       @logger.level = ::Logger::INFO
       @logger.formatter = Proc.new do |severity, datetime, progname, msg|
         severity = "[#{severity}]".ljust(7)
