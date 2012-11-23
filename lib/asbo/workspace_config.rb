@@ -21,7 +21,7 @@ module ASBO
     def package_source(package, type)
       # First look in package section, then in main bit. In each, first check type, then 'release'
       source = {}
-      
+
       if @source_config.has_key?(package)
         source = @source_config[package][type].merge(source) if @source_config[package].has_key?(type)
         source = @source_config[package]['release'].merge(source) if @source_config[package].has_key?('release')
@@ -43,13 +43,20 @@ module ASBO
     end
 
     def resolve_config_vars(value, var_definitions={}, section=nil)
+      if value.is_a?(Hash)
+        value.each do |k,v|
+          value[k] = resolve_config_vars(v, var_definitions, section)
+        end
+        return value
+      end
+
       var_definitions = find_vars(@source_config, section).merge(var_definitions)
 
       # Make sure all of the definitions are resolved
       var_definitions.each do |k,v|
         var_definitions[k] = resolve_vars_in_str(v, var_definitions) if v =~ VARIABLE_FIND_REGEX
       end
-
+      
       value = resolve_vars_in_str(value, var_definitions)
       value
     end

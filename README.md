@@ -124,7 +124,6 @@ It's currently work-in-development, and may only be partially finished, but deta
 
 ##### Defined variables
  - `$package`: The name of the package
- - `$version`: The version of the package
 
  The teamcity backend currently does not support 'latest' builds.
  It assumes that the build name corresponds exactly to the version specified in `buildfile.yml`, and that the artifacts are packaged in a zip file called `<package>.zip`. 

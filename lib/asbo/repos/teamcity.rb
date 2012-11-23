@@ -9,11 +9,18 @@ module ASBO::Repo
 
     def initialize(workspace_config, source, package, type, version)
       @type, @version = type, version
+
+      args = {
+        'package' => package,
+      }
+      source = workspace_config.resolve_config_vars(source, args, package)
+
       @url = source['url']
       @user = source['username']
       @pass = source['password']
       @project = source['project']
-      @teamcity_package = source['package'] ? workspace_config.resolve_config_vars(source['package'], {}, package) : package
+      
+      @teamcity_package = source['package'] ? workspace_config.resolve_config_vars(source['package'], args,  package) : package
       log.debug "Using teamcity package #{@teamcity_package}"
     end
 
