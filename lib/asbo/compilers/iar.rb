@@ -14,12 +14,12 @@ module ASBO::Compiler
     def prepare
       file = File.join(@output_dir, COMPILER_FILE)
       include_opts = include_opts(@dependencies)
-      log.info "Writing compiler opts '#{include_opts}' to #{file}"
+      log.debug "Writing compiler opts '#{include_opts}' to #{file}"
       File.open(file, 'w'){ |f| f.write(include_opts) }
 
       file = File.join(@output_dir, LINKER_FILE)
       linker_opts = linker_opts(@dependencies)
-      log.info "Writing linker opts '#{linker_opts}' to #{file}"
+      log.debug "Writing linker opts '#{linker_opts}' to #{file}"
       File.open(File.join(@output_dir, LINKER_FILE), 'w'){ |f| f.write(linker_opts) }
     end
 

@@ -110,10 +110,9 @@ module ASBO
       log.info "Extracting #{dep}"
       extract_package(file, dep)
       # Now get recursive deps, if and only if the buildifle exists
+      # We want about it not existing when we look at recursive dependencies in a bit
       if File.file?(File.join(dependency_path(dep), BUILDFILE))
         download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config))
-      else
-        log.warn "Can't find buildfile for dep #{dep}"
       end
     end
 

@@ -11,6 +11,10 @@ module ASBO
 
       @logger = ::Logger.new(STDOUT)
       @logger.level = ::Logger::INFO
+      @logger.formatter = Proc.new do |severity, datetime, progname, msg|
+        severity = "[#{severity}]".ljust(7)
+        "#{severity}: #{msg}\n"
+      end
       @logger
     end
 
