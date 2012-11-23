@@ -124,7 +124,6 @@ module ASBO
         zf.each do |e|
           file_dest = File.join(dest, e.name)
           FileUtils.mkdir_p(File.dirname(file_dest))
-           log.debug "Extracting #{e.name} to #{file_dest}..."
            zf.extract(e.name, file_dest)
         end
       end

@@ -63,7 +63,7 @@ module ASBO::Repo
       node = Nokogiri::XML(open(builds_url, :http_basic_authentication => [@user, @pass])).css('build').find{ |x| x['number'] == version }
       raise "Unable to find build number #{version}" unless node
       id = node['id']
-      URI::escape(@url + "/httpAuth/app/rest/builds/id:#{id}/artifacts/files/#{package}.zip")
+      URI::escape(@url + "/httpAuth/app/rest/builds/id:#{id}/artifacts/files/#{package}-#{version}.zip")
     end
   end
 end
