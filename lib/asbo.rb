@@ -35,7 +35,7 @@ module ASBO
 
     case command
     when 'pre-build'
-      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).pre_build
+      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
     when 'post-build'
       BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).post_build
     end
@@ -59,6 +59,8 @@ module ASBO
       opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c'
       opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
+      opt :linker, "Whether to generate linker options, and where to output them to. Use a filename or 'stdout'", :type => String
+      opt :include, "Whether to generate include path options, and where to output them to. Use a filename or 'stdout'", :type => String
     end
   end
 end
