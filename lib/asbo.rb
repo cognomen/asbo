@@ -16,54 +16,49 @@ module ASBO
   COMMANDS = %w{pre-build post-build}
 
   def run(args)
-    default_opts = parse_common_args(args)
+    command = args.shift unless args.empty? || args.first.start_with?('-')
 
-    command = args.shift
+    command_str = COMMANDS.include?(command) ? command : nil
+    parser = create_parser(command_str)
 
-    opts = case command
-    when 'pre-build'
-      parse_build_args(args)
-    when 'post-build'
-      parse_build_args(args)
-    else
-      {}
+    case command
+    when 'pre-build', 'post-build'
+      parse_build_args(parser, command)
     end
 
-    opts = default_opts.merge(opts)
+    opts = Trollop::with_standard_exception_handling(parser) do
+      raise Trollop::HelpNeeded unless COMMANDS.include?(command)
+      parser.parse args
+    end
+
     Logger.verbose = opts[:verbose]
 
     case command
     when 'pre-build'
-      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:compiler], opts[:project]).pre_build
+      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).pre_build
     when 'post-build'
-      BuildManager.new(opts[:arch], opts[:abi], opts[:config], opts[:compiler], opts[:project]).post_build
-    else
-      Trollop::die "Unknown command #{command}" if command && !COMMANDS.include?(command)
+      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).post_build
     end
   end
 
-  def parse_common_args(args)
-    opts = Trollop::options(args) do
-      banner "Usage: #{File.basename(__FILE__)} (pre-build|post-build) [args]\n" <<
-      "See #{File.basename(__FILE__)} <subcommand> --help for more details"
+  def create_parser(command)
+    command_str = command ? command : "(" << COMMANDS.join('|') << ")"
+    Trollop::Parser.new do 
+      banner "Usage: #{File.basename(__FILE__)} #{command_str} [args]\n\n"
+      banner "See #{File.basename(__FILE__)} <subcommand> --help for more details\n\n" unless command
+      banner "Common arguments:"
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
       stop_on COMMANDS
     end
-    opts
   end
 
-  def parse_build_args(args)
-    # Annoying default options have to be duplicated here.
-    # TODO resolve
-
-    opts = Trollop::options(args) do
+  def parse_build_args(parser, subcommand)
+    parser.instance_eval do
       opt :arch, "Architecture you're building", :type => String, :required => true, :short => 'a'
       opt :abi, "ABI you're building", :type => String, :required => true, :short => 'b'
       opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c'
       opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
-      opt :verbose, "Be Verbose", :default => false, :short => 'v'
     end
-    opts
   end
 end
