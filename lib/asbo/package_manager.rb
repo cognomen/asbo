@@ -65,7 +65,7 @@ module ASBO
       r
     end
 
-    def cache_project(build_config, version)
+    def cache_project(version)
       src = @project_config.project_dir
       dest = package_path(@project_config.package, version)
 

@@ -17,9 +17,7 @@ module ASBO
       pacman = PackageManager.new(@workspace_config, @project_config)
       pacman.download_dependencies
 
-
       compiler = Compiler::factory(@compiler, pacman)
-
       
       output(output_opts[:linker], compiler.linker_opts) if output_opts[:linker]
       output(output_opts[:include], compiler.include_opts) if output_opts[:include]
@@ -30,7 +28,7 @@ module ASBO
       log.info "Performing post-build action"
       pacman = PackageManager.new(@workspace_config, @project_config)
       version = ENV['VERSION'] || SOURCE_VERSION
-      pacman.cache_project(@build_config, version)
+      pacman.cache_project(version)
     end
 
     def output(dest, value)

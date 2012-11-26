@@ -28,6 +28,7 @@ module ASBO
 
     opts = Trollop::with_standard_exception_handling(parser) do
       raise Trollop::HelpNeeded unless COMMANDS.include?(command)
+
       parser.parse args
     end
 
@@ -35,10 +36,24 @@ module ASBO
 
     case command
     when 'pre-build'
-      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
+      opts = prep_arch_abi_build_config(opts)
+      BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
     when 'post-build'
-      BuildManager.new(*opts.values_at(:arch, :abi, :config, :compiler, :project)).post_build
+      opts = prep_arch_abi_build_config(opts)
+      BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
     end
+  end
+
+  def prep_arch_abi_build_config(opts)
+    raise "The compiler '#{opts[:compiler]}' requires that you pass the architecture" if Compiler.needs_arch?(opts[:compiler]) && !opts[:arch_given]
+    raise "The compiler '#{opts[:compiler]}' requires that you pass the abi" if Compiler.needs_abi?(opts[:compiler]) && !opts[:abi_given]
+    raise "The compiler '#{opts[:compiler]}' requires that you pass the build config" if Compiler.needs_build_config?(opts[:compiler]) && !opts[:build_config_given]
+
+    opts[:arch] ||= Compiler.arch(opts[:compiler])
+    opts[:abi] ||= Compiler.abi(opts[:compiler])
+    opts[:build_config] ||= Compiler.build_config(opts[:compiler])
+
+    opts
   end
 
   def create_parser(command)
@@ -54,10 +69,10 @@ module ASBO
 
   def parse_build_args(parser, subcommand)
     parser.instance_eval do
-      opt :arch, "Architecture you're building", :type => String, :required => true, :short => 'a'
-      opt :abi, "ABI you're building", :type => String, :required => true, :short => 'b'
-      opt :config, "Build configuration (e.g. Debug) you're building", :type => String , :required => true, :short => 'c'
-      opt :compiler, "Compler you're building with. Valid values are #{Compiler::COMPILERS.join(', ')}", :type => String, :required => true, :short => 'o'
+      opt :arch, "Architecture you're building. Required for some compilers", :type => String, :short => 'a'
+      opt :abi, "ABI you're building. Required for some compilers", :type => String, :short => 'b'
+      opt :build_config, "Build configuration (e.g. Debug) you're building. Required for some compilers", :type => String, :short => 'c'
+      opt :compiler, "Compler you're building with. Valid values are #{Compiler.compilers.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
       opt :linker, "Whether to generate linker options, and where to output them to. Use a filename or 'stdout'", :type => String
       opt :include, "Whether to generate include path options, and where to output them to. Use a filename or 'stdout'", :type => String
