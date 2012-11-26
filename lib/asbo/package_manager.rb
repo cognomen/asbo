@@ -43,6 +43,14 @@ module ASBO
       File.join(dependency_path(dep), 'bin', "#{dep.arch}-#{dep.abi}-#{dep.build_config}")
     end
 
+    def binaries_path(dep)
+      File.join(dependency_path(dep), 'bin')
+    end
+
+    def lib_path(dep)
+      File.join(dependency_path(dep), 'lib')
+    end
+
     def all_dependencies
       r = []
       @project_config.dependencies.each do |dep|
@@ -82,6 +90,7 @@ module ASBO
       FileUtils.cp(File.join(source, BUILDFILE), File.join(dest, BUILDFILE))
       cp_if_exists(source, dest, 'inc')
       cp_if_exists(source, dest, 'bin')
+      cp_if_exists(source, dest, 'lib')
     end
 
     private
