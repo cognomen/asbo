@@ -9,6 +9,7 @@ require_relative 'asbo/workspace_config'
 require_relative 'asbo/dependency'
 require_relative 'asbo/repo'
 require_relative 'asbo/compiler'
+require_relative 'asbo/app_error'
 
 module ASBO
   extend self
@@ -36,20 +37,27 @@ module ASBO
     Logger.be_quiet if opts[:quiet]
     Logger.add_file_logger(File.join(opts[:project] || Dir.getwd, 'asbo.log'))
 
-    case command
-    when 'pre-build'
-      opts = prep_arch_abi_build_config(opts)
-      BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
-    when 'post-build'
-      opts = prep_arch_abi_build_config(opts)
-      BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
+    begin
+      case command
+      when 'pre-build'
+        opts = prep_arch_abi_build_config(opts)
+        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
+      when 'post-build'
+        opts = prep_arch_abi_build_config(opts)
+        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
+      end
+    rescue AppError => e
+      Logger.logger.error e.message
+      # Always print backtrace to file, and print to stderr if requested
+      Logger.file_logger.error e.backtrace.join("\n")
+      warn e.backtrace.join("\n") if opts[:backtrace]
     end
   end
 
   def prep_arch_abi_build_config(opts)
-    raise "The compiler '#{opts[:compiler]}' requires that you pass the architecture" if Compiler.needs_arch?(opts[:compiler]) && !opts[:arch_given]
-    raise "The compiler '#{opts[:compiler]}' requires that you pass the abi" if Compiler.needs_abi?(opts[:compiler]) && !opts[:abi_given]
-    raise "The compiler '#{opts[:compiler]}' requires that you pass the build config" if Compiler.needs_build_config?(opts[:compiler]) && !opts[:build_config_given]
+    raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the architecture" if Compiler.needs_arch?(opts[:compiler]) && !opts[:arch_given]
+    raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the abi" if Compiler.needs_abi?(opts[:compiler]) && !opts[:abi_given]
+    raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the build config" if Compiler.needs_build_config?(opts[:compiler]) && !opts[:build_config_given]
 
     opts[:arch] ||= Compiler.arch(opts[:compiler])
     opts[:abi] ||= Compiler.abi(opts[:compiler])
@@ -66,6 +74,7 @@ module ASBO
       banner "Common arguments:"
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
       opt :quiet, "Be quiet", :default => false, :short => 'q'
+      opt :backtrace, "Show a backtrace on error", :default => false
       conflicts :verbose, :quiet
       stop_on COMMANDS
     end

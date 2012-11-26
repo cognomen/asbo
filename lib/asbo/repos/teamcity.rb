@@ -33,7 +33,7 @@ module ASBO::Repo
         url = get_release_url(bt, @version, @teamcity_package)
 
       else
-        raise "Currently unsupported build type #{type}"
+        raise AppError,  "Currently unsupported build type #{type}"
       end
 
       log.debug "Downloading from #{url}"
@@ -57,18 +57,18 @@ module ASBO::Repo
       log.debug "Looking for projects: #{projects_url}"
       log.debug "Using teamcity project #{project}"
       node = Nokogiri::XML(open(projects_url, :http_basic_authentication => [@user, @pass])).css('project').find{ |x| x['name'] == project }
-      raise "Can't find teamcity project #{project}" unless node
+      raise AppError,  "Can't find teamcity project #{project}" unless node
       project_url = @url + node['href']
       log.debug "Looking for BT: #{project_url}"
       node = Nokogiri::XML(open(project_url, :http_basic_authentication => [@user, @pass])).css('buildType').find{ |x| x['name'] == package }
-      raise "Can't find teamcity package #{package}" unless node
+      raise AppError,  "Can't find teamcity package #{package}" unless node
       node['id']
     end
 
     def get_release_url(bt, version, package)
       builds_url = @url + "/httpAuth/app/rest/buildTypes/id:#{bt}/builds"
       node = Nokogiri::XML(open(builds_url, :http_basic_authentication => [@user, @pass])).css('build').find{ |x| x['number'] == version }
-      raise "Unable to find build number #{version}" unless node
+      raise AppError,  "Unable to find build number #{version}" unless node
       id = node['id']
       URI::escape(@url + "/httpAuth/app/rest/builds/id:#{id}/artifacts/files/#{package}-#{version}.zip")
     end

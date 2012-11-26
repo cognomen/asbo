@@ -14,7 +14,7 @@ module ASBO::Repo
     end
 
     def download
-      raise "Can't find package source #{@source}" unless ::File.file?(@path)
+      raise AppError,  "Can't find package source #{@source}" unless ::File.file?(@path)
       @path
     end
   end

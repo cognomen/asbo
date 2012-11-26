@@ -9,9 +9,9 @@ module ASBO
     def initialize(project_dir, arch, abi, build_config)
       @arch, @abi, @build_config, @project_dir = arch, abi, build_config, project_dir
       buildfile = File.join(project_dir, BUILDFILE)
-      raise "Can't find buildfile at #{File.expand_path(buildfile)}" unless File.file?(buildfile)
+      raise AppError,  "Can't find buildfile at #{File.expand_path(buildfile)}" unless File.file?(buildfile)
       @config = YAML::load_file(buildfile)
-      raise "Invalid buildfile (no package specified)" unless @config && @config.has_key?('package')
+      raise AppError,  "Invalid buildfile (no package specified)" unless @config && @config.has_key?('package')
 
       personal_buildfile = File.join(project_dir, PERSONAL_BUILDFILE)
       @config.merge!(YAML::load_file(personal_buildfile)) if File.file?(personal_buildfile)

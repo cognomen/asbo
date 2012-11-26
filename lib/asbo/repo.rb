@@ -7,7 +7,7 @@ module ASBO
       source = workspace_config.package_source(package, type)
 
       driver = source['driver']
-      raise "You must specify the driver in sources.yml" unless driver
+      raise AppError,  "You must specify the driver in sources.yml" unless driver
 
       case driver
       when 'file'
@@ -15,7 +15,7 @@ module ASBO
       when 'teamcity'
         Repo::TeamCity.new(workspace_config, source, package, type, version)
       else
-        raise "Unknown driver '#{driver}' for source #{source}"
+        raise AppError,  "Unknown driver '#{driver}' for source #{source}"
       end
     end
   end

@@ -15,7 +15,7 @@ module ASBO
       when 'iar'
         Compiler::IAR.new(*args)
       else
-        raise "Unknown compiler: #{compiler}"
+        raise AppError,  "Unknown compiler: #{compiler}"
       end
     end
 

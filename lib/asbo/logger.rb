@@ -37,14 +37,18 @@ module ASBO
       stdout_logger.level = ::Logger::ERROR
     end
 
+    def self.file_logger
+      @file_logger
+    end
+
     def self.add_file_logger(file)
-      file_logger = ::Logger.new(file, 1, 1024000)
-      file_logger.level = ::Logger::DEBUG
-      file_logger.formatter = Proc.new do |severity, datetime, progname, msg|
+      @file_logger = ::Logger.new(file, 1, 1024000)
+      @file_logger.level = ::Logger::DEBUG
+      @file_logger.formatter = Proc.new do |severity, datetime, progname, msg|
         severity = "[#{severity}]".ljust(7)
         "#{datetime.strftime('%FT%R')} #{severity}: #{msg}\n"
       end
-      logger.add_logger(file_logger)
+      logger.add_logger(@file_logger)
     end
 
     def self.included(klass)

@@ -99,7 +99,7 @@ module ASBO
       if dep_downloaded?(dep)
         log.debug "Source dependency #{dep} found"
       else
-        raise "#{@project_config.package} specifies #{dep} as a dependency. This is a source dependency, so you need to build it"
+        raise AppError,  "#{@project_config.package} specifies #{dep} as a dependency. This is a source dependency, so you need to build it"
       end
     end
 

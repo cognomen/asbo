@@ -9,7 +9,7 @@ module ASBO
     def initialize(start_dir)
       @workspace = find_workspace(start_dir)
       sources_config = File.join(@workspace, SOURCES_CONFIG)
-      raise "Unable to find sources config file (should be at #{sources_config})" unless File.file?(sources_config)
+      raise AppError,  "Unable to find sources config file (should be at #{sources_config})" unless File.file?(sources_config)
       @source_config = YAML::load_file(sources_config)
     end
 
@@ -30,7 +30,7 @@ module ASBO
       source = @source_config[type].merge(source) if @source_config.has_key?(type)
       source = @source_config['release'].merge(source) if @source_config.has_key?('release')
 
-      raise "Could not find source for package #{package}, type #{type}" if source == {}
+      raise AppError,  "Could not find source for package #{package}, type #{type}" if source == {}
 
       source
     end
@@ -73,7 +73,7 @@ module ASBO
       folder = File.expand_path(start_dir)
       until File.exists?(File.join(folder, WORKSPACE_INDICATOR)) do
         folder, old = File.expand_path(File.join(folder, '..')), folder
-        raise "Unable to find workspace directory, starting at #{start_dir} (looking for #{WORKSPACE_INDICATOR})" if folder == old
+        raise AppError,  "Unable to find workspace directory, starting at #{start_dir} (looking for #{WORKSPACE_INDICATOR})" if folder == old
       end
       folder
     end
