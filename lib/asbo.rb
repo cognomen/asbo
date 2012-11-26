@@ -51,6 +51,7 @@ module ASBO
       # Always print backtrace to file, and print to stderr if requested
       Logger.file_logger.error e.backtrace.join("\n")
       warn e.backtrace.join("\n") if opts[:backtrace]
+      exit 1
     end
   end
 
