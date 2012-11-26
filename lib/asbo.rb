@@ -33,6 +33,7 @@ module ASBO
     end
 
     Logger.verbose = opts[:verbose]
+    Logger.add_file_logger(File.join(opts[:project] || Dir.getwd, 'asbo.log'))
 
     case command
     when 'pre-build'
