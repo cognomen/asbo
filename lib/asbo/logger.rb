@@ -28,9 +28,13 @@ module ASBO
       @stdout_logger
     end
 
-    def self.verbose=(value)
+    def self.be_verbose
       # This only affects the stdout_logger - other file loggers are always DEBUG
-      stdout_logger.level = value ? ::Logger::DEBUG : ::Logger::INFO
+      stdout_logger.level = ::Logger::DEBUG
+    end
+
+    def self.be_quiet
+      stdout_logger.level = ::Logger::ERROR
     end
 
     def self.add_file_logger(file)

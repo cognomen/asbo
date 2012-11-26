@@ -32,7 +32,8 @@ module ASBO
       parser.parse args
     end
 
-    Logger.verbose = opts[:verbose]
+    Logger.be_verbose if opts[:verbose]
+    Logger.be_quiet if opts[:quiet]
     Logger.add_file_logger(File.join(opts[:project] || Dir.getwd, 'asbo.log'))
 
     case command
@@ -64,6 +65,8 @@ module ASBO
       banner "See #{File.basename(__FILE__)} <subcommand> --help for more details\n\n" unless command
       banner "Common arguments:"
       opt :verbose, "Be Verbose", :default => false, :short => 'v'
+      opt :quiet, "Be quiet", :default => false, :short => 'q'
+      conflicts :verbose, :quiet
       stop_on COMMANDS
     end
   end
