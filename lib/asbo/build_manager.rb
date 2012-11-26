@@ -12,23 +12,31 @@ module ASBO
       @verbose = false
     end
 
+    def package_manager
+      @pacman ||= PackageManager.new(@workspace_config, @project_config)
+      @pacman
+    end
+
+    def download_deps
+      package_manager.download_dependencies
+    end
+
+    def compiler
+      Compiler::factory(@compiler, package_manager)
+    end
+
     def pre_build(output_opts)
       log.info "Performing pre-build action"
-      pacman = PackageManager.new(@workspace_config, @project_config)
-      pacman.download_dependencies
-
-      compiler = Compiler::factory(@compiler, pacman)
+      download_deps
       
-      output(output_opts[:linker], compiler.linker_opts) if output_opts[:linker]
-      output(output_opts[:include], compiler.include_opts) if output_opts[:include]
-      # compiler.prepare
+      output(output_opts[:bin], compiler.bin_paths_str) if output_opts[:bin]
+      output(output_opts[:include], compiler.include_paths_str) if output_opts[:include]
     end
 
     def post_build
       log.info "Performing post-build action"
-      pacman = PackageManager.new(@workspace_config, @project_config)
       version = ENV['VERSION'] || SOURCE_VERSION
-      pacman.cache_project(version)
+      package_manager.cache_project(version)
     end
 
     def output(dest, value)

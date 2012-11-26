@@ -74,8 +74,8 @@ module ASBO
       opt :build_config, "Build configuration (e.g. Debug) you're building. Required for some compilers", :type => String, :short => 'c'
       opt :compiler, "Compler you're building with. Valid values are #{Compiler.compilers.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
-      opt :linker, "Whether to generate linker options, and where to output them to. Use a filename or 'stdout'", :type => String
-      opt :include, "Whether to generate include path options, and where to output them to. Use a filename or 'stdout'", :type => String
+      opt :bin, "Whether to generate binary (linker) options, and where to output them to. Use a filename or 'stdout'", :type => String
+      opt :include, "Whether to generate library (include) path options, and where to output them to. Use a filename or 'stdout'", :type => String
     end
   end
 end
