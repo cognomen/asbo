@@ -22,8 +22,8 @@ module ASBO
     end
 
     def dependencies
-      return [] unless @config['dependencies']
-      @config['dependencies'].map do |x|
+      return [] unless @config['depends']
+      @config['depends'].map do |x|
         project, config, version = x.split(/\s*:\s*/, 3)
         # Allow them to skip the config bit
         if version.nil?
