@@ -19,7 +19,9 @@ module ASBO
     def download_dependencies(project_config=nil)
       project_config ||= @project_config
       log.info "Resolving dependencies for #{project_config.package}..."
-      project_config.dependencies.each do |dep|
+      deps = project_config.dependencies
+      log.debug "No dependencies found" if deps.empty?
+      deps.each do |dep|
         log.debug "Processing dependency #{dep}"
         if dep.is_source?
           process_source_dep(dep)
