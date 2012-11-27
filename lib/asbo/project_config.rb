@@ -35,10 +35,13 @@ module ASBO
       end
     end
 
+    def publish_rules
+      return {} unless @config['publish']
+      Hash[@config['publish'].map{ |x| x.split(/\s*=>\s*/) }]
+    end
+
     def to_dep(build_config, version)
       Dependency.new(package, version, build_config, @arch, @abi)
     end
-
-
   end
 end

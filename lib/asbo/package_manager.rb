@@ -4,6 +4,12 @@ module ASBO
   class PackageManager
     include Logger
 
+    PUBLISH_RULES = {
+      'inc/.' => 'inc',
+      'bin/.' => 'bin',
+      'lib/.' => 'lib',
+    }
+
     attr_reader :workspace_config, :project_config
 
     def initialize(workspace_config, project_config)
@@ -88,9 +94,9 @@ module ASBO
     def package_project(source, dest)
       FileUtils.mkdir_p(dest)
       FileUtils.cp(File.join(source, BUILDFILE), File.join(dest, BUILDFILE))
-      cp_if_exists(source, dest, 'inc')
-      cp_if_exists(source, dest, 'bin')
-      cp_if_exists(source, dest, 'lib')
+      (PUBLISH_RULES.merge(@project_config.publish_rules)).each do |from, to|
+        cp_if_exists(File.join(source, from), File.join(dest, to))
+      end
     end
 
     private
@@ -137,13 +143,14 @@ module ASBO
       end
     end
 
-    def cp_if_exists(source, dest, folder)
-      src = File.join(source, folder)
-      dst = File.join(dest, folder)
-      return unless File.exist?(src)
+    def cp_if_exists(from, to)
+      from_glob = Dir.glob(from)
+      return if from.empty?
 
-      log.debug "Copying #{src} to #{dst}"
-      FileUtils.cp_r(src, dst)
+      FileUtils.mkdir_p(to)
+
+      log.debug "Copying #{from} to #{to}"
+      FileUtils.cp_r(from_glob, to)
     end
   end
 end
