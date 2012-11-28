@@ -15,7 +15,7 @@ module ASBO::Repo
       url = source['url']
       parsed_url = URI::parse(url)
       @user = parsed_url.user || source['username'] || 'anonymous'
-      @pass = parsed_url.password || source['password'] || ''
+      @pass = parsed_url.password || source['password'] || nil
       @host = parsed_url.host
       @path = parsed_url.path
 
