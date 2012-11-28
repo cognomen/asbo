@@ -47,7 +47,7 @@ module ASBO::Repo
       file.path
     end
 
-    def publish(file)
+    def publish(file, overwrite=false)
       log.debug "Publishing #{@path}"
       Net::FTP.open(@host) do |ftp|
         begin
@@ -57,6 +57,7 @@ module ASBO::Repo
         end
         log.debug "Logged in."
         ftp.passive = true
+
         begin
           ftp.chdir(::File.dirname(@path))
         rescue Net::FTPPermError => e
@@ -65,9 +66,12 @@ module ASBO::Repo
             ftp.mkdir(::File.dirname(@path))
             ftp.chdir(::File.dirname(@path))
           else
-            raise AppError, "Could not chdir, #{e.message}"
+            raise ASBO::AppError, "Could not chdir, #{e.message}"
           end
         end
+
+        exists = ftp.size(::File.basename(@path)) > 0 rescue false
+        raise ASBO::AppError, "File #{@path} already exists. Use the appropriate flag to force overwriting" if exists && !overwrite
 
         log.debug "Uploading..."
         ftp.putbinaryfile(file, ::File.basename(@path))

@@ -118,10 +118,10 @@ module ASBO
       zip
     end
 
-    def publish_zip(zip, version)
+    def publish_zip(zip, version, overwrite=false)
       repo = Repo.factory(@workspace_config, @project_config.package, version, 'release', :publish)
       raise AppError, "Repo #{repo} doesn't know how to publish packages" unless repo.respond_to?(:publish)
-      repo.publish(zip)
+      repo.publish(zip, overwrite)
     end
 
     private

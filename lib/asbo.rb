@@ -47,12 +47,12 @@ module ASBO
         opts = prep_arch_abi_build_config(opts)
         BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
       when 'publish'
-        BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version])
+        BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version], opts[:overwrite])
       end
     rescue AppError => e
-      Logger.logger.error e.message
+      Logger.logger.fatal e.message
       # Always print backtrace to file, and print to stderr if requested
-      Logger.file_logger.error e.backtrace.join("\n")
+      Logger.file_logger.fatal e.backtrace.join("\n")
       warn e.backtrace.join("\n") if opts[:backtrace]
       exit 1
     end
@@ -99,6 +99,7 @@ module ASBO
   def parse_publish_args(parser)
     parser.instance_eval do 
       opt :package_version, "Version of the package to publish", :type => String, :required => true
+      opt :overwrite, "Whether to overwrite the file if it exists already", :defualt => false
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
     end
   end

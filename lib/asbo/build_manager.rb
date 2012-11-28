@@ -39,10 +39,10 @@ module ASBO
       package_manager.cache_project(version)
     end
 
-    def publish(version)
+    def publish(version, overwrite=false)
       log.info "Performing publish action, version #{version}"
       file = package
-      package_manager.publish_zip(file, version)
+      package_manager.publish_zip(file, version, overwrite)
     end
 
     def package
