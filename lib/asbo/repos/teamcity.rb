@@ -33,7 +33,7 @@ module ASBO::Repo
         url = get_release_url(bt, @version, @teamcity_package)
 
       else
-        raise AppError,  "Currently unsupported build type #{type}"
+        raise AppError, "Currently unsupported build type #{type}"
       end
 
       log.debug "Downloading from #{url}"

@@ -1,5 +1,6 @@
 require 'trollop'
 
+require_relative 'asbo/app_error'
 require_relative 'asbo/logger'
 require_relative 'asbo/build_manager'
 require_relative 'asbo/constants'
@@ -9,7 +10,6 @@ require_relative 'asbo/workspace_config'
 require_relative 'asbo/dependency'
 require_relative 'asbo/repo'
 require_relative 'asbo/compiler'
-require_relative 'asbo/app_error'
 
 module ASBO
   extend self

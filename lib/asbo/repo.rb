@@ -1,5 +1,6 @@
 require_relative 'repos/file'
 require_relative 'repos/teamcity'
+require_relative 'repos/ftp'
 
 module ASBO
   module Repo
@@ -14,6 +15,8 @@ module ASBO
         Repo::File.new(workspace_config, source, package, type, version)
       when 'teamcity'
         Repo::TeamCity.new(workspace_config, source, package, type, version)
+      when 'ftp'
+        Repo::FTP.new(workspace_config, source, package, type, version)
       else
         raise AppError,  "Unknown driver '#{driver}' for source #{source}"
       end
