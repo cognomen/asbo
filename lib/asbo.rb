@@ -14,7 +14,7 @@ require_relative 'asbo/compiler'
 module ASBO
   extend self
 
-  COMMANDS = %w{pre-build post-build}
+  COMMANDS = %w{pre-build post-build publish}
 
   def run(args)
     command = args.shift unless args.empty? || args.first.start_with?('-')
@@ -25,11 +25,12 @@ module ASBO
     case command
     when 'pre-build', 'post-build'
       parse_build_args(parser, command)
+    when 'publish'
+      parse_publish_args(parser)
     end
 
     opts = Trollop::with_standard_exception_handling(parser) do
       raise Trollop::HelpNeeded unless COMMANDS.include?(command)
-
       parser.parse args
     end
 
@@ -45,6 +46,8 @@ module ASBO
       when 'post-build'
         opts = prep_arch_abi_build_config(opts)
         BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
+      when 'publish'
+        BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version])
       end
     rescue AppError => e
       Logger.logger.error e.message
@@ -90,6 +93,13 @@ module ASBO
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
       opt :bin, "Whether to generate binary (linker) options, and where to output them to. Use a filename or 'stdout'", :type => String
       opt :include, "Whether to generate library (include) path options, and where to output them to. Use a filename or 'stdout'", :type => String
+    end
+  end
+
+  def parse_publish_args(parser)
+    parser.instance_eval do 
+      opt :package_version, "Version of the package to publish", :type => String, :required => true
+      opt :project, "Path to the project you're building", :type => String, :short => 'p'
     end
   end
 end

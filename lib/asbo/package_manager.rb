@@ -101,6 +101,29 @@ module ASBO
       end
     end
 
+    def package_to_zip(source)
+      dir = Dir.mktmpdir
+      # TODO this could be done better
+      zip = File.join(dir, 'packaged.zip')
+      package_project(source, dir)
+      log.debug "Creating zip: #{zip}"
+      Dir.chdir(dir) do 
+        Zip::ZipFile.open(zip, Zip::ZipFile::CREATE) do |zipfile|
+          Dir['**/*'].each do |file|
+            zipfile.add(file, file)
+          end
+        end
+      end
+
+      zip
+    end
+
+    def publish_zip(zip, version)
+      repo = Repo.factory(@workspace_config, @project_config.package, version, 'release', :publish)
+      raise AppError, "Repo #{repo} doesn't know how to publish packages" unless repo.respond_to?(:publish)
+      repo.publish(zip)
+    end
+
     private
 
     def process_source_dep(dep)
@@ -122,7 +145,7 @@ module ASBO
     def download_dep(dep)
       log.info "Downloading #{dep}"
       type = dep.is_latest? ? 'latest' : 'release'
-      repo = Repo.factory(@workspace_config, dep.package, type, dep.version)
+      repo = Repo.factory(@workspace_config, dep.package, dep.version, type)
       file = repo.download
       log.info "Extracting #{dep}"
       extract_package(file, dep)

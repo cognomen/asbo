@@ -10,6 +10,7 @@ module ASBO::Repo
         'package' => package,
         'version' => version,
       }
+
       source = workspace_config.resolve_config_vars(source, vars, package)
       url = source['url']
       parsed_url = URI::parse(url)
@@ -44,6 +45,22 @@ module ASBO::Repo
 
       log.debug "Downloaded to #{file.path}"
       file.path
+    end
+
+    def publish(file)
+      log.debug "Publishing #{@path}"
+      Net::FTP.open(@host) do |ftp|
+        begin
+          ftp.login(@user, @pass)
+        rescue Net::FTPPermError => e 
+          raise ASBO::AppError, "Failed to log in to ftp: #{e.message}"
+        end
+        log.debug "Logged in. Now publishing..."
+        ftp.passive = true
+        ftp.chdir(::File.dirname(@path))
+        ftp.putbinaryfile(file, ::File.basename(@path))
+        log.debug "Done"
+      end
     end
   end
 end

@@ -4,8 +4,15 @@ require_relative 'repos/ftp'
 
 module ASBO
   module Repo
-    def self.factory(workspace_config, package, type, version)
-      source = workspace_config.package_source(package, type)
+    def self.factory(workspace_config, package, version, type, purpose=:download)
+      source = case purpose
+      when :download
+        workspace_config.package_source(package, type)
+      when :publish
+        workspace_config.package_publish_source(package, type)
+      else
+        raise AppError, "Unknown Repo factory type: #{type}"
+      end
 
       driver = source['driver']
       raise AppError,  "You must specify the driver in sources.yml" unless driver

@@ -35,6 +35,14 @@ module ASBO
       source
     end
 
+    def package_publish_source(package, type)
+      # Start with the package source, then try the publish section
+      source = package_source(package, type)
+
+      source.merge!(@source_config["publish_#{type}"]) if @source_config.has_key?("publish_#{type}")
+      source
+    end
+
     def resolve_vars_in_str(str, var_definitions)
       begin
         new_str, str = str.gsub(VARIABLE_FIND_REGEX){ var_definitions[$1] || "$#{$1}" }, new_str

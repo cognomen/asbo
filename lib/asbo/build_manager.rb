@@ -39,6 +39,16 @@ module ASBO
       package_manager.cache_project(version)
     end
 
+    def publish(version)
+      log.info "Performing publish action, version #{version}"
+      file = package
+      package_manager.publish_zip(file, version)
+    end
+
+    def package
+      package_manager.package_to_zip(@project_dir)
+    end
+
     def output(dest, value)
       if dest.empty? || dest == 'stdout'
         puts value
