@@ -55,9 +55,21 @@ module ASBO::Repo
         rescue Net::FTPPermError => e 
           raise ASBO::AppError, "Failed to log in to ftp: #{e.message}"
         end
-        log.debug "Logged in. Now publishing..."
+        log.debug "Logged in."
         ftp.passive = true
-        ftp.chdir(::File.dirname(@path))
+        begin
+          ftp.chdir(::File.dirname(@path))
+        rescue Net::FTPPermError => e
+          if e.message[0, 3] == '550'
+            log.debug "Creating dir: #{::File.dirname(@path)}"
+            ftp.mkdir(::File.dirname(@path))
+            ftp.chdir(::File.dirname(@path))
+          else
+            raise AppError, "Could not chdir, #{e.message}"
+          end
+        end
+
+        log.debug "Uploading..."
         ftp.putbinaryfile(file, ::File.basename(@path))
         log.debug "Done"
       end
