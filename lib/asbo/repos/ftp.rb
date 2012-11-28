@@ -35,8 +35,12 @@ module ASBO::Repo
           end
           ftp.passive = true
           log.debug "Logged in. Now downloading..."
-          ftp.getbinaryfile(@path, nil, 1024) do |chunk|
-            file.write(chunk)
+          begin
+            ftp.getbinaryfile(@path, nil, 1024) do |chunk|
+              file.write(chunk)
+            end
+          rescue Net::FTPPermError => e 
+            raise ASBO::AppError, "Failed to fetch file #{@path}: #{e.message}"
           end
         end
       ensure
@@ -74,8 +78,12 @@ module ASBO::Repo
         raise ASBO::AppError, "File #{@path} already exists. Use the appropriate flag to force overwriting" if exists && !overwrite
 
         log.debug "Uploading..."
-        ftp.putbinaryfile(file, ::File.basename(@path))
-        log.debug "Done"
+        begin
+          ftp.putbinaryfile(file, ::File.basename(@path))
+        rescue Net::FTPPermError => e 
+          raise ASBO::AppError, "Filed to upload file #{@path}: #{e.message}"
+        end
+        log.info "Uploaded #{@path}"
       end
     end
   end
