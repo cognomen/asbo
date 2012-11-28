@@ -124,6 +124,11 @@ module ASBO
       repo.publish(zip, overwrite)
     end
 
+    def clobber
+      log.info "Clobbering cache dir. This could take a while..."
+      FileUtils.rm_rf(@workspace_config.cache_dir)
+    end
+
     private
 
     def process_source_dep(dep)

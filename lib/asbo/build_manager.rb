@@ -49,6 +49,12 @@ module ASBO
       package_manager.package_to_zip(@project_dir)
     end
 
+    def clobber
+      package_manager.clobber
+    end
+
+    private
+
     def output(dest, value)
       if dest.empty? || dest == 'stdout'
         puts value

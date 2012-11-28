@@ -14,7 +14,7 @@ require_relative 'asbo/compiler'
 module ASBO
   extend self
 
-  COMMANDS = %w{pre-build post-build publish}
+  COMMANDS = %w{pre-build post-build publish clobber}
 
   def run(args)
     command = args.shift unless args.empty? || args.first.start_with?('-')
@@ -48,6 +48,8 @@ module ASBO
         BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
       when 'publish'
         BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version], opts[:overwrite])
+      when 'clobber'
+        BuildManager.new(nil, nil, nil, nil, opts[:project]).clobber
       end
     rescue AppError => e
       Logger.logger.fatal e.message
