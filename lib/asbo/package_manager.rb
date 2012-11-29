@@ -40,7 +40,7 @@ module ASBO
     end
 
     def package_path(package, version)
-       File.join(@workspace_config.cache_dir, "#{package}-#{version}")
+       File.join(@workspace_config.cache_dir, "#{project}-#{package}-#{version}")
     end
 
     def headers_path(dep)
@@ -83,9 +83,9 @@ module ASBO
 
     def cache_project(version)
       src = @project_config.project_dir
-      dest = package_path(@project_config.package, version)
+      dest = package_path(@project_config.project, version)
 
-      log.info "Caching #{@project_config.package} to #{dest}"
+      log.info "Caching #{@project_config.project} to #{dest}"
       # TODO tell them how to nuke this, when we implement it
       log.warn "Overwriting previously-cached copy of version #{version}" if File.directory?(dest) && version != SOURCE_VERSION
 

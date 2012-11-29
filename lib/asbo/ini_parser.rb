@@ -121,7 +121,9 @@ module ASBO
     # This function will use type information from self.defaults / default, if available.
     # Example: config_object.get('section.key', 'default_value')
     def get(arg, default=nil)
-      section, key = arg.match(/(.*)\.(.*)/)[1..2]
+      matches = arg.match(/(.*)\.(.*)/)
+      raise "Arg #{arg} to IniParser#get must be in the form section.key" unless matches
+      section, key = matches[1..2]
       section = section.to_sym
       key = key.to_sym
 

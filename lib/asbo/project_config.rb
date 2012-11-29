@@ -22,9 +22,17 @@ module ASBO
       @config['project.name']
     end
 
+    def packages
+      @config.find_sections(/^package\..*$/)
+    end
+
     def dependencies
-      return [] unless @config['depends']
-      @config['depends'].map do |x|
+      deps = []
+      dep_config = @config.get('project.depends', [])
+      dep_config.push(*packages.map{ |_,p| p[:depends] || [] })
+
+      return [] unless dep_config
+      dep_config.map do |x|
         project, config, version = x.split(/\s*:\s*/, 3)
         # Allow them to skip the config bit
         if version.nil?
