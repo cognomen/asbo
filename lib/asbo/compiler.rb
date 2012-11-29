@@ -1,4 +1,5 @@
 require_relative 'compilers/iar'
+require_relative 'compilers/ruby'
 
 module ASBO
   module Compiler
@@ -7,6 +8,11 @@ module ASBO
         :arch => 'arm',
         :abi => nil,
         :build_config => nil,
+      },
+      'ruby' => {
+        :arch => 'ruby',
+        :abi => 'ruby',
+        :build_config => 'ruby',
       }
     }
 
@@ -14,8 +20,10 @@ module ASBO
       case compiler
       when 'iar'
         Compiler::IAR.new(*args)
+      when 'ruby'
+        Compiler::Ruby.new(*args)
       else
-        raise AppError,  "Unknown compiler: #{compiler}"
+        raise ASBO::AppError,  "Unknown compiler: #{compiler}"
       end
     end
 
@@ -44,7 +52,7 @@ module ASBO
     end
 
     def self.build_config(compiler)
-      COPMILERS[compiler][:build_config]
+      COMPILERS[compiler][:build_config]
     end
   end
 end

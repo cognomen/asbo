@@ -1,5 +1,5 @@
 module ASBO::Compiler
-  class IAR
+  class Ruby
     include ASBO::Logger
 
     def initialize(package_mananger)
@@ -9,26 +9,23 @@ module ASBO::Compiler
     end
     
     def include_paths
-      include_paths = @dependencies.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths = @dependencies.map{ |dep| @pacman.lib_path(dep) }.select{ |x| File.directory?(x) }
       include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
       include_paths
     end
 
     def include_paths_str
-     include_paths.map{ |x| %Q{-I"#{x}"} }.join(' ')
+     include_paths.join(':')
     end
 
     def bin_paths
-      artifacts = @dependencies.map do |dep|
-        log.debug "Looking for linker targets in #{@pacman.artifacts_path(dep)}"
-        # Glob all .a files
-        Dir["#{@pacman.artifacts_path(dep)}/*.a"]
-      end
-      artifacts.flatten
+      bin_paths = @dependencies.map{ |dep| @pacman.binaries_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths.each{ |x| log.debug "Looking for bin targets in #{x}" }
+      bin_paths
     end
 
     def bin_paths_str
-      bin_paths.map{ |x| %Q{"#{x}"} }.join("\n")
+      bin_paths.join(':')
     end
   end
 end

@@ -61,6 +61,7 @@ module ASBO
   end
 
   def prep_arch_abi_build_config(opts)
+    raise AppError, "The compiler '#{opts[:compiler]}'' doesn't exit" unless Compiler.compilers.include?(opts[:compiler])
     raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the architecture" if Compiler.needs_arch?(opts[:compiler]) && !opts[:arch_given]
     raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the abi" if Compiler.needs_abi?(opts[:compiler]) && !opts[:abi_given]
     raise AppError, "The compiler '#{opts[:compiler]}' requires that you pass the build config" if Compiler.needs_build_config?(opts[:compiler]) && !opts[:build_config_given]

@@ -101,10 +101,10 @@ module ASBO
       end
     end
 
-    def package_to_zip(source)
-      dir = Dir.mktmpdir
+    def package_to_zip(source, output=nil)
+      zip = output ? output : File.join(Dir.mktmpdir, 'packaged.zip')
+      dir = File.dirname(zip)
       # TODO this could be done better
-      zip = File.join(dir, 'packaged.zip')
       package_project(source, dir)
       log.debug "Creating zip: #{zip}"
       Dir.chdir(dir) do 
