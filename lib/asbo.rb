@@ -1,5 +1,6 @@
 require 'trollop'
 
+require_relative 'asbo/ini_parser'
 require_relative 'asbo/app_error'
 require_relative 'asbo/logger'
 require_relative 'asbo/build_manager'

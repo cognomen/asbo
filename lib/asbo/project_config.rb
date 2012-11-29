@@ -10,15 +10,16 @@ module ASBO
       @arch, @abi, @build_config, @project_dir = arch, abi, build_config, project_dir
       buildfile = File.join(project_dir, BUILDFILE)
       raise AppError,  "Can't find buildfile at #{File.expand_path(buildfile)}" unless File.file?(buildfile)
-      @config = YAML::load_file(buildfile)
-      raise AppError,  "Invalid buildfile (no package specified)" unless @config && @config.has_key?('package')
+      # @config = YAML::load_file(buildfile)
+      @config = IniParser.new(buildfile).load
+      raise AppError,  "Invalid buildfile (no project specified)" unless @config['project.name']
 
-      personal_buildfile = File.join(project_dir, PERSONAL_BUILDFILE)
-      @config.merge!(YAML::load_file(personal_buildfile)) if File.file?(personal_buildfile)
+      # personal_buildfile = File.join(project_dir, PERSONAL_BUILDFILE)
+      # @config.merge!(YAML::load_file(personal_buildfile)) if File.file?(personal_buildfile)
     end
 
-    def package
-      @config['package']
+    def project
+      @config['project.name']
     end
 
     def dependencies

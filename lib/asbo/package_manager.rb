@@ -18,7 +18,7 @@ module ASBO
 
     def download_dependencies(project_config=nil)
       project_config ||= @project_config
-      log.info "Resolving dependencies for #{project_config.package}..."
+      log.info "Resolving dependencies for #{project_config.project}..."
       deps = project_config.dependencies
       log.debug "No dependencies found" if deps.empty?
       deps.each do |dep|
