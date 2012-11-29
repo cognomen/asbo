@@ -96,6 +96,9 @@ module ASBO
     def package_project(source, dest)
       FileUtils.mkdir_p(dest)
       FileUtils.cp(File.join(source, BUILDFILE), File.join(dest, BUILDFILE))
+      PACKAGE_FILES.each do |file|
+        cp_if_exists(File.join(source, file), dest)
+      end
       (PUBLISH_RULES.merge(@project_config.publish_rules)).each do |from, to|
         cp_if_exists(File.join(source, from), File.join(dest, to))
       end
@@ -175,7 +178,7 @@ module ASBO
 
     def cp_if_exists(from, to)
       from_glob = Dir.glob(from)
-      return if from.empty?
+      return if from_glob.empty?
 
       FileUtils.mkdir_p(to)
 

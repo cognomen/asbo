@@ -7,4 +7,5 @@ module ASBO
   SOURCES_CONFIG = '.asbo/sources.yml'
   SOURCE_VERSION = 'source'
   LATEST_VERSION = 'latest'
+  PACKAGE_FILES = []
 end
