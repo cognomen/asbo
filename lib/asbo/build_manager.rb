@@ -4,10 +4,10 @@ module ASBO
 
     attr_accessor :verbose
 
-    def initialize(arch, abi, build_config, compiler, project_dir=nil)
+    def initialize(arch, abi, build_config, compiler, package=nil, project_dir=nil)
       project_dir ||= Dir.getwd
-      @arch, @abi, @build_config, @compiler, @project_dir = arch, abi, build_config, compiler, project_dir
-      @project_config = ProjectConfig.new(project_dir, arch, abi, build_config)
+      @arch, @abi, @build_config, @compiler, @package, @project_dir = arch, abi, build_config, compiler, package, project_dir
+      @project_config = ProjectConfig.new(project_dir, arch, abi, build_config, package)
       @workspace_config = WorkspaceConfig.new(project_dir)
       @verbose = false
     end
@@ -25,27 +25,46 @@ module ASBO
       Compiler::factory(@compiler, package_manager)
     end
 
-    def pre_build(output_opts)
+    def pre_build(output_opts={})
+      if !@package && @project_config.packages.count > 1
+        raise AppError, "You must provide a package to pre-build, as this project has multiple packages" 
+      end
       log.info "Performing pre-build action"
       download_deps
       
       output(output_opts[:bin], compiler.bin_paths_str) if output_opts[:bin]
       output(output_opts[:include], compiler.include_paths_str) if output_opts[:include]
+
+      self
     end
 
     def post_build
+       if !@package && @project_config.packages.count > 1
+        raise AppError, "You must provide a package to post-build, as this project has multiple packages" 
+      end
       log.info "Performing post-build action"
       version = ENV['VERSION'] || SOURCE_VERSION
       package_manager.cache_project(version)
+
+      self
     end
 
     def publish(version, overwrite=false)
-      log.info "Performing publish action, version #{version}"
-      file = package
-      package_manager.publish_zip(file, version, overwrite)
+      # If there are packages, use them, otherwise use default
+      packages = @project_config.packages.empty? ? [nil] : @project_config.packages
+      # packages = @package ? [@package] : @project_config.packages
+      packages.each do |package|
+        package_str = package ? " #{package}" : ''
+        log.info "Performing publish action for package#{package_str}, version #{version}"
+        file = package(nil, package)
+        package_manager.publish_zip(file, version, overwrite)
+      end
     end
 
-    def package(output=nil)
+    # If package is nil, package the default package, otherwise package the specified one
+    def package(output=nil, package=nil)
+      # Allow overwriting...
+      @project_config.package = package
       package_manager.package_to_zip(@project_dir, output)
     end
 

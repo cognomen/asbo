@@ -1,9 +1,13 @@
 module ASBO
   class Dependency
-    attr_reader :package, :version, :build_config, :arch, :abi
+    attr_reader :project, :package, :version, :build_config, :arch, :abi
 
-    def initialize(package, version, build_config, arch, abi)
-      @package, @version, @build_config, @arch, @abi = package, version, build_config, arch, abi
+    def initialize(project, package, version, build_config, arch, abi)
+      @project, @package, @version, @build_config, @arch, @abi = project, package, version, build_config, arch, abi
+    end
+
+    def project_package
+      @project + (@package ? "-#{@package}" : '')
     end
 
     def is_source?
@@ -15,7 +19,7 @@ module ASBO
     end
 
     def to_s
-      "#{@package}-#{@version}"
+      "#{project_package}-#{@version}" 
     end
   end
 end

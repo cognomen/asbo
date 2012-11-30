@@ -36,11 +36,12 @@ module ASBO
     end
 
     def dependency_path(dep)
-     package_path(dep.package, dep.version)
+     package_path(dep.project, dep.package, dep.version)
     end
 
-    def package_path(package, version)
-       File.join(@workspace_config.cache_dir, "#{project}-#{package}-#{version}")
+    def package_path(project, package, version)
+      package_str = package.nil? ? '' : "#{package}-"
+      File.join(@workspace_config.cache_dir, "#{project}-#{package_str}#{version}")
     end
 
     def headers_path(dep)
@@ -73,7 +74,7 @@ module ASBO
         log.warn "Unable to find buildfile for #{dep}"
         return [dep]
       end
-      deps = ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config).dependencies
+      deps = ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config, @project_config.package).dependencies
       r = [dep]
       deps.each do |d|
         r.push(*recursive_dependencies(d))
@@ -83,7 +84,7 @@ module ASBO
 
     def cache_project(version)
       src = @project_config.project_dir
-      dest = package_path(@project_config.project, version)
+      dest = package_path(@project_config.project, @project_config.package, version)
 
       log.info "Caching #{@project_config.project} to #{dest}"
       # TODO tell them how to nuke this, when we implement it
@@ -99,6 +100,7 @@ module ASBO
       PACKAGE_FILES.each do |file|
         cp_if_exists(File.join(source, file), dest)
       end
+      p @project_config.publish_rules
       (PUBLISH_RULES.merge(@project_config.publish_rules)).each do |from, to|
         cp_if_exists(File.join(source, from), File.join(dest, to))
       end
@@ -122,7 +124,7 @@ module ASBO
     end
 
     def publish_zip(zip, version, overwrite=false)
-      repo = Repo.factory(@workspace_config, @project_config.package, version, 'release', :publish)
+      repo = Repo.factory(@workspace_config, @project_config.project_package, version, 'release', :publish)
       raise AppError, "Repo #{repo} doesn't know how to publish packages" unless repo.respond_to?(:publish)
       repo.publish(zip, overwrite)
     end
@@ -153,14 +155,14 @@ module ASBO
     def download_dep(dep)
       log.info "Downloading #{dep}"
       type = dep.is_latest? ? 'latest' : 'release'
-      repo = Repo.factory(@workspace_config, dep.package, dep.version, type)
+      repo = Repo.factory(@workspace_config, dep.project_package, dep.version, type)
       file = repo.download
       log.info "Extracting #{dep}"
       extract_package(file, dep)
       # Now get recursive deps, if and only if the buildifle exists
       # We want about it not existing when we look at recursive dependencies in a bit
       if File.file?(File.join(dependency_path(dep), BUILDFILE))
-        download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config))
+        download_dependencies(ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config, dep.package))
       end
     end
 

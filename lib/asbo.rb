@@ -43,10 +43,10 @@ module ASBO
       case command
       when 'pre-build'
         opts = prep_arch_abi_build_config(opts)
-        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).pre_build(opts) # HACKY - filter opts
+        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :package, :project)).pre_build(opts) # HACKY - filter opts
       when 'post-build'
         opts = prep_arch_abi_build_config(opts)
-        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :project)).post_build
+        BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :package, :project)).post_build
       when 'publish'
         BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version], opts[:overwrite])
       when 'clobber'
@@ -95,6 +95,7 @@ module ASBO
       opt :build_config, "Build configuration (e.g. Debug) you're building. Required for some compilers", :type => String, :short => 'c'
       opt :compiler, "Compler you're building with. Valid values are #{Compiler.compilers.join(', ')}", :type => String, :required => true, :short => 'o'
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
+      opt :package, "Which package you want to build, if you've got more than one", :type => String
       opt :bin, "Whether to generate binary (linker) options, and where to output them to. Use a filename or 'stdout'", :type => String
       opt :include, "Whether to generate library (include) path options, and where to output them to. Use a filename or 'stdout'", :type => String
     end

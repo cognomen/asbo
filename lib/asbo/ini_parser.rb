@@ -19,7 +19,8 @@ module ASBO
         @config, @comments = {}, {}
       end
       apply_defaults(@defaults)
-      save
+      # DOn't want to overwrite in this case
+      # save
       self # Allow chaining
     end
 
