@@ -18,7 +18,7 @@ module ASBO
 
     def download_dependencies(project_config=nil)
       project_config ||= @project_config
-      log.info "Resolving dependencies for #{project_config.project}..."
+      log.info "Resolving dependencies for #{project_config.project_package}..."
       deps = project_config.dependencies
       log.debug "No dependencies found" if deps.empty?
       deps.each do |dep|
@@ -74,7 +74,7 @@ module ASBO
         log.warn "Unable to find buildfile for #{dep}"
         return [dep]
       end
-      deps = ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config, @project_config.package).dependencies
+      deps = ProjectConfig.new(dependency_path(dep), dep.arch, dep.abi, @project_config.build_config, dep.package).dependencies
       r = [dep]
       deps.each do |d|
         r.push(*recursive_dependencies(d))
@@ -89,6 +89,7 @@ module ASBO
       log.info "Caching #{@project_config.project} to #{dest}"
       # TODO tell them how to nuke this, when we implement it
       log.warn "Overwriting previously-cached copy of version #{version}" if File.directory?(dest) && version != SOURCE_VERSION
+      FileUtils.rm_rf(dest)
 
       package_project(src, dest)
     end
@@ -100,8 +101,10 @@ module ASBO
       PACKAGE_FILES.each do |file|
         cp_if_exists(File.join(source, file), dest)
       end
-      p @project_config.publish_rules
-      (PUBLISH_RULES.merge(@project_config.publish_rules)).each do |from, to|
+      rules = @project_config.publish_rules.empty? ? PUBLISH_RULES : @project_config.publish_rules
+
+      rules.each do |from, to|
+        log.debug "Processing rule #{from} => #{to}"
         cp_if_exists(File.join(source, from), File.join(dest, to))
       end
     end

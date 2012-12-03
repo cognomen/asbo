@@ -14,6 +14,9 @@ module ASBO
       @config = IniParser.new(buildfile).load
       raise AppError,  "Invalid buildfile (no project specified)" unless @config['project.name']
 
+      # Check the specified package actually exists
+      raise AppError, "Package #{package} doesn't exist" if @package && !packages.include?(@package)
+
       # Use the first package if there's only one
       @package ||= packages.length == 1 ? packages.first : nil
 
