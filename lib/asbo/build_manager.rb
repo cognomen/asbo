@@ -81,7 +81,7 @@ module ASBO
       if dest.empty? || dest == 'stdout'
         puts value
       else
-        File.open(dest, 'w'){ |f| f.write(value) }
+        File.open(File.join(@project_dir, dest), 'w'){ |f| f.write(value) }
       end
     end
   end
