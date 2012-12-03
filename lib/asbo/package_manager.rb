@@ -86,7 +86,7 @@ module ASBO
       src = @project_config.project_dir
       dest = package_path(@project_config.project, @project_config.package, version)
 
-      log.info "Caching #{@project_config.project} to #{dest}"
+      log.info "Caching #{@project_config.project_package} to #{dest}"
       # TODO tell them how to nuke this, when we implement it
       log.warn "Overwriting previously-cached copy of version #{version}" if File.directory?(dest) && version != SOURCE_VERSION
       FileUtils.rm_rf(dest)
