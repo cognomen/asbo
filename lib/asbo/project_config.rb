@@ -20,6 +20,8 @@ module ASBO
       # Use the first package if there's only one
       @package ||= packages.length == 1 ? packages.first : nil
 
+      raise AppError, "Package names may not contain hyphens" if packages.any?{ |x| x.include?('-') }
+
       # personal_buildfile = File.join(project_dir, PERSONAL_BUILDFILE)
       # @config.merge!(YAML::load_file(personal_buildfile)) if File.file?(personal_buildfile)
     end

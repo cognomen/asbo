@@ -41,7 +41,7 @@ module ASBO
        if !@package && @project_config.packages.count > 1
         raise AppError, "You must provide a package to post-build, as this project has multiple packages" 
       end
-      log.info "Performing post-build action"
+      log.info "Performing post-build action for package #{@project_config.project_package}"
       version = ENV['VERSION'] || SOURCE_VERSION
       package_manager.cache_project(version)
 

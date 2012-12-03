@@ -9,7 +9,7 @@ module ASBO::Compiler
     end
     
     def include_paths
-      include_paths = @dependencies.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths = @dependencies.map{ |dep| @pacman.headers_path(dep) }.select{ |x| File.directory?(x) }.uniq
       include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
       include_paths
     end
@@ -24,7 +24,7 @@ module ASBO::Compiler
         # Glob all .a files
         Dir["#{@pacman.artifacts_path(dep)}/*.a"]
       end
-      artifacts.flatten
+      artifacts.flatten.uniq
     end
 
     def bin_paths_str

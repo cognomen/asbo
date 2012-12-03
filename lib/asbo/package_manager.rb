@@ -182,10 +182,10 @@ module ASBO
     end
 
     def cp_if_exists(from, to)
+      FileUtils.mkdir_p(to)
+
       from_glob = Dir.glob(from)
       return if from_glob.empty?
-
-      FileUtils.mkdir_p(to)
 
       log.debug "Copying #{from} to #{to}"
       FileUtils.cp_r(from_glob, to)

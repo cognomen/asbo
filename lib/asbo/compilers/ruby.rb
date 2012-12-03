@@ -9,7 +9,7 @@ module ASBO::Compiler
     end
     
     def include_paths
-      include_paths = @dependencies.map{ |dep| @pacman.lib_path(dep) }.select{ |x| File.directory?(x) }
+      include_paths = @dependencies.map{ |dep| @pacman.lib_path(dep) }.select{ |x| File.directory?(x) }.uniq
       include_paths.each{ |x| log.debug "Looking for include targets in #{x}" }
       include_paths
     end
@@ -19,7 +19,7 @@ module ASBO::Compiler
     end
 
     def bin_paths
-      bin_paths = @dependencies.map{ |dep| @pacman.binaries_path(dep) }.select{ |x| File.directory?(x) }
+      bin_paths = @dependencies.map{ |dep| @pacman.binaries_path(dep) }.select{ |x| File.directory?(x) }.uniq
       include_paths.each{ |x| log.debug "Looking for bin targets in #{x}" }
       bin_paths
     end
