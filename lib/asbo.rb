@@ -48,9 +48,9 @@ module ASBO
         opts = prep_arch_abi_build_config(opts)
         BuildManager.new(*opts.values_at(:arch, :abi, :build_config, :compiler, :package, :project)).post_build
       when 'publish'
-        BuildManager.new(nil, nil, nil, nil, opts[:project]).publish(opts[:package_version], opts[:overwrite])
+        BuildManager.new(nil, nil, nil, nil, opts[:package], opts[:project]).publish(opts[:package_version], opts[:overwrite])
       when 'clobber'
-        BuildManager.new(nil, nil, nil, nil, opts[:project]).clobber
+        BuildManager.new(nil, nil, nil, nil, nil, opts[:project]).clobber
       end
     rescue AppError => e
       Logger.logger.fatal e.message
@@ -106,6 +106,7 @@ module ASBO
       opt :package_version, "Version of the package to publish", :type => String, :required => true
       opt :overwrite, "Whether to overwrite the file if it exists already", :defualt => false
       opt :project, "Path to the project you're building", :type => String, :short => 'p'
+      opt :package, "Which package you want to build. Defaults to all", :type => String
     end
   end
 end

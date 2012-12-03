@@ -31,7 +31,6 @@ module ASBO
       end
       log.info "Performing pre-build action"
       download_deps
-      
       output(output_opts[:bin], compiler.bin_paths_str) if output_opts[:bin]
       output(output_opts[:include], compiler.include_paths_str) if output_opts[:include]
 
@@ -51,7 +50,11 @@ module ASBO
 
     def publish(version, overwrite=false)
       # If there are packages, use them, otherwise use default
-      packages = @project_config.packages.empty? ? [nil] : @project_config.packages
+      if @package
+        packages = [@package]
+      else
+        packages = @project_config.packages.empty? ? [nil] : @project_config.packages
+      end
       # packages = @package ? [@package] : @project_config.packages
       packages.each do |package|
         package_str = package ? " #{package}" : ''
