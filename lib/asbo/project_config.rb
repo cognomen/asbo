@@ -34,25 +34,29 @@ module ASBO
     end
 
     def dependencies
-      dep_config = package.nil? ? @config.get('project.depends', []) : @config.get("package.#{@package}.depends", [])
+      dep_config = [*@config.get('project.depends', [])]
+      dep_config.push(*@config.get("package.#{@package}.depends", [])) if package
 
       return [] unless dep_config
       [*dep_config].map do |x|
         project, config, version = x.split(/\s*:\s*/, 3)
+        # Split on the last hyphen
+        *project_bits = project.split('-')
+        package = project_bits.length > 1 ? project_bits.pop : nil
+        project = project_bits.join('-')
         # Allow them to skip the config bit
         if version.nil?
           version, config = config, @build_config
         elsif config.empty?
           config = @build_config
         end
-        Dependency.new(project, @package, version, config, @arch, @abi)
+        Dependency.new(project, package, version, config, @arch, @abi)
       end
     end
 
     def publish_rules
       rules = [*@config.get('project.publish', [])]
       rules.push(*@config.get("package.#{@package}.publish", [])) if @package
-      p rules
       Hash[rules.map{ |x| x.split(/\s*=>\s*/) }]
     end
 
