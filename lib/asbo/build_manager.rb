@@ -6,7 +6,7 @@ module ASBO
 
     def initialize(arch, abi, build_config, compiler, package=nil, project_dir=nil)
       project_dir ||= Dir.getwd
-      # for some reason, Dir.glob (later one) doesn't like backslashes
+      # for some reason, Dir.glob (later on) doesn't like backslashes
       project_dir = project_dir.gsub('\\', '/')
       @arch, @abi, @build_config, @compiler, @package, @project_dir = arch, abi, build_config, compiler, package, project_dir
       @project_config = ProjectConfig.new(project_dir, arch, abi, build_config, package)

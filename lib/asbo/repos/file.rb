@@ -21,24 +21,24 @@ module ASBO::Repo
     end
 
     def publish(file, overwrite=false)
-      log.debug "Publishing #{@path}"
+      log.debug "Publishing #{file} to #{@path}"
 
       begin
-       FileUtils.mkdir_p(::File.dirname(@path))
+       FileUtils.mkdir_p(@path) unless ::File.directory?(@path)
       rescue SystemCallError => e
         raise ASBO::AppError, "Failed to create dir: #{e.message}"
       end
 
-      exists = ::File.file?(::File.basename(@path))
+      exists = ::File.file?(file)
       raise ASBO::AppError, "File #{@path} already exists. Use the appropriate flag to force overwriting" if exists && !overwrite
 
       log.debug "Uploading..."
       begin
-        FileUtils.cp(file, ::File.basename(@path))
+        FileUtils.cp(file, @path)
       rescue SystemCallError => e
         raise ASBO::AppError, "Failed to upload file #{@path}: #{e.message}"
       end
-      log.info "Uploaded #{@path}"
+      log.info "Uploaded to #{@path}"
     end
   end
 end
