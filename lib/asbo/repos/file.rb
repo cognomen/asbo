@@ -29,16 +29,16 @@ module ASBO::Repo
         raise ASBO::AppError, "Failed to create dir: #{e.message}"
       end
 
-      exists = ::File.file?(file)
+      exists = ::File.file?(@path)
       raise ASBO::AppError, "File #{@path} already exists. Use the appropriate flag to force overwriting" if exists && !overwrite
 
       log.debug "Uploading..."
       begin
         FileUtils.cp(file, @path)
       rescue SystemCallError => e
-        raise ASBO::AppError, "Failed to upload file #{@path}: #{e.message}"
+        raise ASBO::AppError, "Failed to publish file #{@path}: #{e.message}"
       end
-      log.info "Uploaded to #{@path}"
+      log.info "Published #{@path}"
     end
   end
 end
